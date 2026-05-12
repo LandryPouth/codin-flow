@@ -42,6 +42,25 @@ Then verify the installation:
 npx ai-native-coding-flow doctor
 ```
 
+You can also install directly from the GitHub repository without publishing to npm:
+
+```bash
+npx github:LandryPouth/codin-flow init
+```
+
+Then verify:
+
+```bash
+npx github:LandryPouth/codin-flow doctor
+```
+
+To install from a specific branch or tag:
+
+```bash
+npx github:LandryPouth/codin-flow#main init
+npx github:LandryPouth/codin-flow#v0.1.0 init
+```
+
 If you installed the package globally or linked it locally:
 
 ```bash
