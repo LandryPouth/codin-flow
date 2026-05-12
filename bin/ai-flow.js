@@ -155,9 +155,9 @@ function printHelp() {
   log(`Coding Flow
 
 Usage:
-  ai-flow init [--force] [--dry-run]
-  ai-flow doctor
-  ai-flow help
+  coding-flow init [--force] [--dry-run]
+  coding-flow doctor
+  coding-flow help
 
 Commands:
   init      Install Claude/Codex workflow files into the current project.
@@ -193,5 +193,5 @@ if (command === "init") {
 } else if (command === "help" || command === "--help" || command === "-h") {
   printHelp();
 } else {
-  fail(`unknown command "${command}". Run "ai-flow help".`);
+  fail(`unknown command "${command}". Run "coding-flow help".`);
 }

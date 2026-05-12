@@ -33,22 +33,10 @@ plan -> write stories -> run a story -> validate -> document what happened
 Inside the project you want to equip:
 
 ```bash
-npx ai-native-coding-flow init
-```
-
-Then verify the installation:
-
-```bash
-npx ai-native-coding-flow doctor
-```
-
-You can also install directly from the GitHub repository without publishing to npm:
-
-```bash
 npx github:LandryPouth/codin-flow init
 ```
 
-Then verify:
+Then verify the installation:
 
 ```bash
 npx github:LandryPouth/codin-flow doctor
@@ -64,14 +52,14 @@ npx github:LandryPouth/codin-flow#v0.1.0 init
 If you installed the package globally or linked it locally:
 
 ```bash
-ai-flow init
-ai-flow doctor
+coding-flow init
+coding-flow doctor
 ```
 
 Existing files are skipped by default. Use this only when you intentionally want to overwrite installed workflow files:
 
 ```bash
-ai-flow init --force
+coding-flow init --force
 ```
 
 ## What Gets Installed
@@ -491,33 +479,15 @@ To test the package as a global command:
 
 ```bash
 npm link
-ai-flow init --dry-run
-ai-flow doctor
+coding-flow init --dry-run
+coding-flow doctor
 ```
 
-## Publishing To npm
-
-Pick a unique package name in `package.json`. If you publish under your npm user or organization scope, use a scoped name:
-
-```json
-{
-  "name": "@your-scope/ai-native-coding-flow"
-}
-```
-
-Then run:
-
-```bash
-npm login
-npm pack --dry-run
-npm publish --access public
-```
-
-Use `--access public` for the first publish of a public scoped package.
+This workflow is intended to be installed from GitHub, not published to npm.
 
 ## Roadmap
 
-- `ai-flow add-epic`
-- `ai-flow add-story`
+- `coding-flow add-epic`
+- `coding-flow add-story`
 - smarter merge behavior for existing docs
-- `ai-flow doctor --fix`
+- `coding-flow doctor --fix`
