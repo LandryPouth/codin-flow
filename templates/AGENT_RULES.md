@@ -15,10 +15,11 @@ Shared operating rules for Claude Code, Codex, and any specialized agents.
 
 - For large changes, read `docs/project-context.md`, `docs/architecture.md`, and `docs/conventions.md`.
 - For story work, read the epic `index.md` and every file in the story folder before coding.
+- For story work, start code discovery from the story `Context Scope` or orchestrator `Context Map`.
 - Implement only the active story scope.
 - Update `implementation-notes.md` after execution.
 - Update `decisions.md` when a meaningful tradeoff is made.
-- Every story execution must define an Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes before implementation begins.
+- Every story execution must define an Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes before implementation begins.
 
 ## Context Boundaries
 
@@ -27,6 +28,9 @@ Shared operating rules for Claude Code, Codex, and any specialized agents.
 - Story-level `decisions.md` stores detailed story decisions, tradeoffs, alternatives, and consequences.
 - Story-level `implementation-notes.md` stores what was actually changed, tests run, issues, follow-ups, and remaining risks.
 - Only update `project-context.md` when the project's current state, target architecture, domains, roles, workflows, constraints, risks, roadmap, or decision summary changes.
+- Do not broadly inspect the repository when the story provides targeted files, symbols, routes, commands, or search anchors.
+- If the initial context budget is exceeded before the edit point is clear, stop, summarize findings, and justify any additional files to inspect.
+- Use `$agent-context-scout` only for broad, ambiguous, cross-module, or high-risk stories; the scout should not modify files.
 
 ## Composite Workflows
 
@@ -112,6 +116,7 @@ When stopped, report:
 
 - Use `*-check` skills for quick, targeted post-story checklists.
 - Use `agent-validator-*` skills for deeper reviewer-agent passes on risky or broad changes.
+- `agent-context-scout`: compact pre-implementation Context Map for broad, ambiguous, cross-module, or high-risk stories.
 - `architecture-check`: quick architecture checklist after a normal story.
 - `agent-validator-architecture`: deep architecture review for refactors, cross-module changes, new patterns, or architecture-critical work.
 - `tests-check`: quick test adequacy checklist after implementation.

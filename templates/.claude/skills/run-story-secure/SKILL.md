@@ -17,11 +17,12 @@ This workflow includes the normal story pipeline plus security validation. Use i
 - The active story should live under `epics/epic-NN-name/story-NN-NN-name/`.
 - Server-side enforcement beats client-side checks.
 - Atomic skills remain authoritative for their own phase.
+- Secure execution should start from `Context Scope` or the orchestrator `Context Map`, with extra care to avoid loading unrelated sensitive code paths into context.
 
 ## Pipeline
 
 1. Use `$agent-planner` or `$grill-me` if requirements, permissions, or data visibility are unclear.
-2. Use `$agent-orchestrator` to create the Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
+2. Use `$agent-orchestrator` to create the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
 3. Use `$tdd` for critical permission, validation, or workflow logic.
 4. Use `$implement-slice` to implement the story end-to-end.
 5. Use `$tests-check` to validate test adequacy.
@@ -37,6 +38,7 @@ This workflow includes the normal story pipeline plus security validation. Use i
 - Use `$agent-validator-security` for auth systems, permission models, payments, uploads, secrets, external integrations, or sensitive data.
 - Use `$agent-validator-architecture` for security changes that alter boundaries, data flow, or module ownership.
 - Use `$agent-validator-tests` when security behavior lacks strong test evidence.
+- Use `$agent-context-scout` before implementation when the secure story is broad, ambiguous, cross-module, or marked `Scout needed: yes`; the scout must not modify files.
 
 ## Required Security Questions
 
@@ -80,6 +82,7 @@ Before implementation, capture:
 ## Pipeline Status
 
 - Orchestration:
+- Context Map:
 - Implementation:
 - Tests check:
 - Architecture check:

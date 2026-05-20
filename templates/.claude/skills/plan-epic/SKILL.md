@@ -36,6 +36,7 @@ Do not fail the workflow just because parallelism is unavailable.
 - `docs/project-context.md` is the current state map only.
 - Story `decisions.md` stores detailed decisions.
 - Story `implementation-notes.md` stores what actually happened during implementation.
+- Every story must include a `Context Scope` so implementation starts from targeted files, symbols, routes, and commands instead of broad repository review.
 
 ## Subagent Policy
 
@@ -58,6 +59,35 @@ Important limitation:
 
 - If this skill is already running inside a subagent, the Agent/subagent tool may not be available.
 - In that case, use the fallback path below.
+
+## Context Efficiency Policy
+
+Planning should reduce implementation context load.
+
+The epic index must include a short strategy explaining how stories should avoid unnecessary codebase exploration. Each story must then carry its own concrete `Context Scope`.
+
+Use `$agent-context-scout` only when it will produce a compact Context Map for a broad, ambiguous, cross-module, or high-risk story. The scout must not implement code. Its output should be short and directly usable:
+
+```md
+## Context Map
+
+Relevant files:
+- `path` - why it matters
+
+Search anchors:
+- `symbol|string/route/command` - what it should reveal
+
+Likely edit points:
+- `path` - expected change
+
+Risks:
+- contract, migration, permissions, tests, or side effects
+
+Avoid unless needed:
+- `path/glob` - why it is probably outside scope
+```
+
+Do not use a scout for small FAST stories or when the story already names clear edit points.
 
 ## Phase 0 - Readiness
 
@@ -83,6 +113,7 @@ Run these steps sequentially. Do not spawn subagents yet.
    - story folder name
    - one-line user/system outcome
    - recommended intensity mode: FAST, STANDARD, or STRICT
+   - targeted context hints: likely files/directories, search anchors, areas to avoid, scout yes/no
 4. Use `$blueprint-epic-index` to create `epics/{epic-name}/index.md`.
 
 The epic index must include the full story list. Story-generation subagents will use it as their shared source of truth.
@@ -122,6 +153,13 @@ Then use $write-story and the blueprint skills to create all five files inside {
 - tests.md
 - decisions.md
 - implementation-notes.md
+
+The story must include a concrete Context Scope:
+- known relevant files or directories
+- search anchors to run first
+- files or areas to avoid unless needed
+- scout needed: yes/no
+- initial context budget
 
 Create the story directory if it does not exist.
 Scope your output strictly to this story.

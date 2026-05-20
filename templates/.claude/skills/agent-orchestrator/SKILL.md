@@ -24,10 +24,11 @@ You do not create bureaucracy. You reduce ambiguity until implementation can hap
 1. Identify the active epic and story from the user request or current context.
 2. Load the required inputs below.
 3. Summarize the story in one paragraph.
-4. Classify risk: `low`, `medium`, or `high`.
-5. Select worker and validators.
-6. Produce the Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
-7. Stop and wait unless the user explicitly asked you to proceed with implementation.
+4. Extract or create a compact Context Map from the story `Context Scope`.
+5. Classify risk: `low`, `medium`, or `high`.
+6. Select worker and validators.
+7. Produce the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
+8. Stop and wait unless the user explicitly asked you to proceed with implementation.
 
 ## Required Inputs
 
@@ -38,6 +39,25 @@ You do not create bureaucracy. You reduce ambiguity until implementation can hap
 - `docs/conventions.md`
 - Active epic `index.md`
 - Active story folder
+
+## Context Map Rules
+
+Every Execution Packet must include a compact Context Map before implementation starts.
+
+Build it from the story `Context Scope`. If the story has no `Context Scope`, create a minimal one from the story, tasks, tests, and epic index before proceeding.
+
+Use `$agent-context-scout` only when the story marks `Scout needed: yes` or the implementation would otherwise require broad codebase exploration. The scout must return only the Context Map and must not modify files.
+
+The Context Map should stay short:
+
+- relevant files/directories and why they matter
+- search anchors to run first
+- likely edit points
+- risks and validation focus
+- files or areas to avoid unless needed
+- initial context budget
+
+If the likely edit point remains unclear after the budgeted discovery, stop and summarize what is known before reading more.
 
 ## Risk Routing
 
@@ -120,6 +140,27 @@ Excluded:
 1. 
 2. 
 3. 
+
+## Context Map
+
+Relevant files:
+- 
+
+Search anchors:
+-
+
+Likely edit points:
+-
+
+Risks:
+-
+
+Avoid unless needed:
+-
+
+Initial context budget:
+- Max files before edit plan:
+- Stop after:
 
 ## Validation Gates
 

@@ -21,11 +21,12 @@ Tasks should guide implementation and validation without turning the story into 
 ## Generation Workflow
 
 1. Read `story.md` and `tests.md`.
-2. Identify code areas and existing patterns to inspect.
-3. Break implementation into 3-7 meaningful steps.
-4. Add testing tasks mapped to risk.
-5. Add validation commands.
-6. Add completion tasks for notes and decisions.
+2. Convert the story `Context Scope` into targeted discovery tasks.
+3. Identify code areas and existing patterns to inspect.
+4. Break implementation into 3-7 meaningful steps.
+5. Add testing tasks mapped to risk.
+6. Add validation commands.
+7. Add completion tasks for notes and decisions.
 
 ## Template
 
@@ -38,6 +39,10 @@ Tasks should guide implementation and validation without turning the story into 
 - [ ] Read `AGENT_RULES.md`
 - [ ] Read `docs/project-context.md`
 - [ ] Read epic `index.md`
+- [ ] Read the story `Context Scope`
+- [ ] Run the listed `Search first` queries before opening broad directories
+- [ ] Read only the listed `Known relevant files or directories` until the edit point is clear
+- [ ] If `Scout needed` is `yes`, request or produce a compact Context Map before implementation
 - [ ] Confirm story scope
 
 ## Implementation Tasks
@@ -76,3 +81,6 @@ Tasks should guide implementation and validation without turning the story into 
 - Do not split by architecture layer unless that is the actual delivery order.
 - Include "inspect existing pattern" tasks when the codebase has conventions.
 - Include rollback or migration tasks when data changes are involved.
+- Include targeted discovery tasks derived from `Context Scope`.
+- Do not add tasks that require broad repository review unless the story explicitly justifies it.
+- If the implementation needs more context than budgeted, add a task to stop, summarize findings, and justify the extra files to inspect.

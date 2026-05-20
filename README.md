@@ -67,6 +67,7 @@ coding-flow init --force
 ```txt
 .claude/
   skills/
+    agent-context-scout/
     agent-orchestrator/
     agent-planner/
     agent-worker-fullstack/
@@ -391,6 +392,7 @@ implementation-notes.md = what actually happened
 Every story execution should define:
 
 - Execution Packet
+- Context Map
 - Validation Gates
 - Stop Conditions
 - Rollback Notes
@@ -407,6 +409,20 @@ Stop instead of guessing when:
 
 When a stop condition triggers, ask for the missing decision or artifact instead of forcing progress.
 
+## Context Efficiency
+
+Stories should keep implementation context small by targeting discovery up front.
+
+Each generated story includes a `Context Scope` with:
+
+- known relevant files or directories
+- search anchors to run before opening broad folders
+- files or areas to avoid unless needed
+- whether `$agent-context-scout` is needed
+- an initial context budget
+
+Use `$agent-context-scout` for broad, ambiguous, cross-module, or high-risk stories. It produces a short Context Map and does not modify files.
+
 ## Skill Selection
 
 Prefer macro skills for daily work:
@@ -417,6 +433,7 @@ Prefer macro skills for daily work:
 
 Use atomic skills when you need control over one phase:
 
+- `agent-context-scout`: produce a compact Context Map before broad or risky implementation
 - `grill-me`: clarify requirements
 - `write-story`: create a story folder
 - `implement-slice`: implement one vertical slice

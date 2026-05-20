@@ -96,6 +96,7 @@ function copyTemplates({ force = false, dryRun = false } = {}) {
 function doctor() {
   const skillNames = [
     "agent-orchestrator",
+    "agent-context-scout",
     "agent-planner",
     "agent-worker-fullstack",
     "agent-worker-tests",

@@ -19,6 +19,7 @@ Use `run-story-secure` instead when the story touches auth, permissions, admin s
 - The active story should live under `epics/epic-NN-name/story-NN-NN-name/`.
 - Atomic skills remain authoritative for their own phase.
 - If a phase finds blocking issues, fix them before continuing.
+- Story execution should start from `Context Scope` or the orchestrator `Context Map`, not broad repository inspection.
 
 ## Choose Intensity
 
@@ -53,7 +54,7 @@ Use for:
 
 Pipeline:
 
-1. Use `$agent-orchestrator` to create the Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
+1. Use `$agent-orchestrator` to create the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
 2. Use `$implement-slice` to implement the story end-to-end.
 3. Use `$tests-check` to validate test adequacy.
 4. Use `$architecture-check` to validate architecture quickly.
@@ -78,7 +79,7 @@ Use for:
 Pipeline:
 
 1. Use `$agent-planner` or `$grill-me` if requirements are unclear.
-2. Use `$agent-orchestrator` to create the Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
+2. Use `$agent-orchestrator` to create the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
 3. Use `$tdd` for critical logic.
 4. Use `$implement-slice`.
 5. Use `$tests-check`.
@@ -94,6 +95,7 @@ Pipeline:
 - Escalate from `$architecture-check` to `$agent-validator-architecture` when the story introduces new patterns, crosses modules, or includes a refactor.
 - Escalate from `$tests-check` to `$agent-validator-tests` when tests are complex, flaky, missing for risky logic, or release-sensitive.
 - Switch to `$run-story-secure` when security-sensitive behavior appears during implementation.
+- Use `$agent-context-scout` before implementation when the story is broad, ambiguous, cross-module, high-risk, or marked `Scout needed: yes`.
 
 ## Stop Conditions
 
@@ -131,6 +133,7 @@ FAST / STANDARD / STRICT
 ## Pipeline Status
 
 - Orchestration:
+- Context Map:
 - Implementation:
 - Tests check:
 - Architecture check:
