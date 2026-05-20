@@ -104,6 +104,7 @@ function doctor() {
     "agent-validator-tests",
     "agent-validator-security",
     "plan-epic",
+    "quick-story",
     "run-story",
     "run-story-secure",
     "grill-me",

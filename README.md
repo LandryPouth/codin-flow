@@ -85,6 +85,7 @@ coding-flow init --force
     blueprint-implementation-notes/
 
     plan-epic/
+    quick-story/
     run-story/
     run-story-secure/
 
@@ -177,7 +178,13 @@ Use $plan-epic to turn this product idea into the first shippable epic and stori
 
 ### Run A Story
 
-Use one of the intensity modes.
+For isolated small changes (single file, copy, simple bug), use the lightweight workflow:
+
+```txt
+Use $quick-story for story-01-01.
+```
+
+For everything else, use one of the intensity modes:
 
 ```txt
 Use $run-story in FAST mode for story-01-01.

@@ -33,11 +33,18 @@ Tasks should guide implementation and validation without turning the story into 
 ```md
 # Tasks - Story NN.NN
 
-## Pre-Implementation
+## Pre-Implementation (FAST)
+
+- [ ] Read story.md and Context Scope
+- [ ] Run the listed `Search first` queries
+- [ ] Read only the listed `Known relevant files or directories` until the edit point is clear
+- [ ] Confirm story scope
+
+## Pre-Implementation (STANDARD / STRICT)
 
 - [ ] Read `PROJECT_RULES.md`
 - [ ] Read `AGENT_RULES.md`
-- [ ] Read `docs/project-context.md`
+- [ ] Read `docs/project-context.md` (if story touches architecture)
 - [ ] Read epic `index.md`
 - [ ] Read the story `Context Scope`
 - [ ] Run the listed `Search first` queries before opening broad directories

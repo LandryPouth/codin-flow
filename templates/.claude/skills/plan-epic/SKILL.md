@@ -62,32 +62,9 @@ Important limitation:
 
 ## Context Efficiency Policy
 
-Planning should reduce implementation context load.
+Planning should reduce implementation context load. The epic index must include a `Context Efficiency Strategy`. Each story must carry a concrete `Context Scope` with: known relevant files, search anchors, areas to avoid, scout yes/no, and initial context budget.
 
-The epic index must include a short strategy explaining how stories should avoid unnecessary codebase exploration. Each story must then carry its own concrete `Context Scope`.
-
-Use `$agent-context-scout` only when it will produce a compact Context Map for a broad, ambiguous, cross-module, or high-risk story. The scout must not implement code. Its output should be short and directly usable:
-
-```md
-## Context Map
-
-Relevant files:
-- `path` - why it matters
-
-Search anchors:
-- `symbol|string/route/command` - what it should reveal
-
-Likely edit points:
-- `path` - expected change
-
-Risks:
-- contract, migration, permissions, tests, or side effects
-
-Avoid unless needed:
-- `path/glob` - why it is probably outside scope
-```
-
-Do not use a scout for small FAST stories or when the story already names clear edit points.
+Use `$agent-context-scout` only for broad, ambiguous, cross-module, or high-risk stories. The scout must not implement code. Do not use it for FAST stories or when the story already names clear edit points.
 
 ## Phase 0 - Readiness
 
@@ -167,13 +144,6 @@ Do not modify other stories.
 Do not modify project-level docs.
 Do not spawn additional subagents.
 ```
-
-Why this works:
-
-- story folders are independent write scopes
-- no two subagents write the same files
-- each subagent can read shared docs safely
-- the orchestrating agent aggregates after completion
 
 ## Phase 2B - Fallback Story Generation
 

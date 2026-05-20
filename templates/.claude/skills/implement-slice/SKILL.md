@@ -21,13 +21,17 @@ The success condition is not "code changed"; it is "acceptance criteria are sati
 
 ## Before Coding
 
-1. Read `PROJECT_RULES.md`.
-2. Read `AGENT_RULES.md`.
-3. Read `docs/project-context.md`, `docs/architecture.md`, and `docs/conventions.md`.
-4. Read the epic `index.md`.
-5. Read all files in the active story folder.
-6. Confirm the story has `Context Scope` or the Execution Packet has `Context Map`.
-7. Confirm the story has an Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
+Read based on intensity mode. If mode is not specified, use STANDARD.
+
+**FAST**: story folder files only (story.md and Context Scope at minimum).
+
+**STANDARD**: the orchestrator has already read all docs and produced a Context Map — start from the Context Map and read only the targeted files it lists. Read epic `index.md` + story folder files if no Context Map is present.
+
+**STRICT**: `PROJECT_RULES.md`, `AGENT_RULES.md`, `docs/project-context.md`, `docs/architecture.md`, `docs/conventions.md`, epic `index.md`, all story folder files.
+
+Then confirm:
+- **FAST**: story has a Context Scope or clear known edit points.
+- **STANDARD/STRICT**: story has Context Scope or Context Map, Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
 
 ## Implementation Strategy
 
@@ -48,10 +52,10 @@ The success condition is not "code changed"; it is "acceptance criteria are sati
 - Prefer existing patterns and helper APIs.
 - Do not broadly scan the repository when targeted search anchors or known relevant files are available.
 - If the initial context budget is exceeded before the edit point is clear, stop, summarize findings, and justify any extra files to inspect.
-- Use `$agent-context-scout` for broad, ambiguous, cross-module, or high-risk stories instead of loading large amounts of code into the implementation context.
+- Use `$agent-context-scout` for broad, ambiguous, cross-module, or high-risk stories instead of loading large amounts of code into context.
 - Add or update tests according to `tests.md`.
-- Record meaningful architecture choices in `decisions.md`.
-- Update `implementation-notes.md` after execution.
+- **FAST**: update `implementation-notes.md` only for non-trivial changes; skip `decisions.md` unless a real tradeoff occurred.
+- **STANDARD/STRICT**: update `implementation-notes.md` always; update `decisions.md` for any meaningful architecture choice.
 
 ## Validation
 

@@ -5,21 +5,15 @@ description: Composite workflow to execute one story end-to-end with an intensit
 
 # Run Story
 
-## Overview
+Use `run-story-secure` instead when the story touches auth, permissions, admin surfaces, user input, persistence, external integrations, secrets, payments, uploads, or sensitive data. For isolated small changes, prefer `$quick-story`.
 
-Run one prepared story through the appropriate execution pipeline.
+## Artifact Contracts By Mode
 
-This is the daily-driver workflow. It prevents manual chaining of the atomic skills while preserving their roles and avoiding unnecessary process for small work.
-
-Use `run-story-secure` instead when the story touches auth, permissions, admin surfaces, user input, persistence, external integrations, secrets, payments, uploads, or sensitive data.
-
-## Conventions
-
-- `{project-root}` means the current repository root.
-- The active story should live under `epics/epic-NN-name/story-NN-NN-name/`.
-- Atomic skills remain authoritative for their own phase.
-- If a phase finds blocking issues, fix them before continuing.
-- Story execution should start from `Context Scope` or the orchestrator `Context Map`, not broad repository inspection.
+| Mode | Reads | Required Artifacts | Traceability |
+|---|---|---|---|
+| FAST | story folder only (implement-slice) | none — inline stop conditions | impl-notes if non-trivial |
+| STANDARD | all docs via orchestrator; implement-slice starts from Context Map only | Execution Packet + Context Map + Gates | impl-notes always; decisions if tradeoff |
+| STRICT | all docs by all agents | all artifacts | both always required |
 
 ## Choose Intensity
 
@@ -39,9 +33,6 @@ Pipeline:
 
 1. Use `$implement-slice`.
 2. Use lightweight `$tests-check`.
-3. Use `$blueprint-implementation-notes`.
-
-FAST mode may use a lightweight inline Execution Packet, but it still needs explicit Stop Conditions and Rollback Notes before editing.
 
 ### STANDARD
 
@@ -108,7 +99,7 @@ Pipeline:
 - Existing architecture conflicts with the requested implementation.
 - Story acceptance criteria are incomplete or not testable.
 
-## Rollback Notes
+## Rollback Notes (STANDARD / STRICT only)
 
 Before implementation, capture:
 
