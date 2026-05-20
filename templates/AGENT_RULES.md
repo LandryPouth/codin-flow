@@ -31,6 +31,7 @@ Shared operating rules for Claude Code, Codex, and any specialized agents.
 ## Composite Workflows
 
 - Use `plan-epic` to create an epic and its implementation-ready stories from product intent or brownfield analysis.
+- Use `quick-story` for small, isolated changes that need no orchestration or formal artifacts.
 - Use `run-story` for story execution in `FAST`, `STANDARD`, or `STRICT` mode.
 - Use `run-story-secure` for security-sensitive stories: normal execution plus security validation.
 - Prefer composite workflows for daily work; use atomic skills when a specific phase needs focused attention.
@@ -43,6 +44,10 @@ Use the lightest mode that protects the story's risk.
 
 Use for small UI changes, copy/text, simple bugs, isolated components, and low-risk local changes.
 
+- **Reads**: story folder files only.
+- **Artifacts**: none required — inline stop conditions suffice.
+- **Traceability**: `implementation-notes.md` only for non-trivial changes; skip `decisions.md` unless a real tradeoff occurred.
+
 Pipeline:
 
 1. `implement-slice`
@@ -52,6 +57,10 @@ Pipeline:
 ### STANDARD
 
 Use for normal CRUD, product features, frontend/backend integration, and ordinary vertical stories.
+
+- **Reads**: orchestrator reads all docs upfront; `implement-slice` reads epic index and story folder.
+- **Artifacts**: Execution Packet + Validation Gates + Stop Conditions + Rollback Notes.
+- **Traceability**: `implementation-notes.md` always; `decisions.md` for meaningful tradeoffs only.
 
 Pipeline:
 
@@ -65,6 +74,10 @@ Pipeline:
 ### STRICT
 
 Use for auth, admin, permissions, payments, DB migrations, risky refactors, security-sensitive work, enterprise workflows, and high-regression-risk changes.
+
+- **Reads**: all docs — `PROJECT_RULES.md`, `AGENT_RULES.md`, `project-context.md`, `architecture.md`, `conventions.md`, epic `index.md`, all story folder files.
+- **Artifacts**: all — Execution Packet + Validation Gates + Stop Conditions + Rollback Notes.
+- **Traceability**: both `implementation-notes.md` and `decisions.md` required.
 
 Pipeline:
 
@@ -112,6 +125,8 @@ When stopped, report:
 
 - Use `*-check` skills for quick, targeted post-story checklists.
 - Use `agent-validator-*` skills for deeper reviewer-agent passes on risky or broad changes.
+- `quick-story`: minimal workflow for isolated changes — no orchestration, no formal artifacts.
+- `agent-context-scout`: compact pre-implementation context discovery for broad, ambiguous, cross-module, or high-risk stories. Does not modify files.
 - `architecture-check`: quick architecture checklist after a normal story.
 - `agent-validator-architecture`: deep architecture review for refactors, cross-module changes, new patterns, or architecture-critical work.
 - `tests-check`: quick test adequacy checklist after implementation.
