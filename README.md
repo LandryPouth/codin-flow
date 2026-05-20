@@ -208,6 +208,38 @@ Use $run-story-secure for story-01-01.
 
 Use the lightest mode that protects the story's risk.
 
+Each mode has an explicit contract for what gets read, what artifacts are required, and what traceability is expected.
+
+| Mode | Reads | Required Artifacts | Traceability |
+|---|---|---|---|
+| **QUICK** | story.md + Context Scope only | none | impl-notes if non-trivial |
+| **FAST** | story folder only | none — inline stop conditions | impl-notes if non-trivial |
+| **STANDARD** | all docs via orchestrator; implement-slice starts from Context Map | Execution Packet + Context Map + Gates | impl-notes always; decisions if tradeoff |
+| **STRICT** | all docs by all agents | all artifacts | both always required |
+
+### Quick Story
+
+Use for isolated, bounded changes that need no orchestration:
+
+- single-file edits
+- copy or text updates
+- simple bug fixes with a clear edit point
+
+Pipeline:
+
+```txt
+implement-slice (story.md + Context Scope only)
+-> tests-check
+```
+
+Stop and switch to FAST or STANDARD if scope is larger than expected.
+
+Example:
+
+```txt
+Use $quick-story for story-02-01.
+```
+
 ### FAST
 
 Use for:
@@ -221,9 +253,8 @@ Use for:
 Pipeline:
 
 ```txt
-implement-slice
+implement-slice (story folder only)
 -> lightweight tests-check
--> implementation-notes
 ```
 
 Example:
@@ -244,8 +275,8 @@ Use for:
 Pipeline:
 
 ```txt
-agent-orchestrator
--> implement-slice
+agent-orchestrator (reads all docs once, produces Context Map)
+-> implement-slice (starts from Context Map only)
 -> tests-check
 -> architecture-check
 -> review-codebase
@@ -285,7 +316,7 @@ planner/grill if needed
 -> security-check
 -> review-codebase
 -> fix loop
--> implementation-notes
+-> implementation-notes + decisions
 ```
 
 Example:
@@ -396,13 +427,15 @@ implementation-notes.md = what actually happened
 
 ## Stop Conditions
 
-Every story execution should define:
+STANDARD and STRICT stories must define before implementation begins:
 
 - Execution Packet
 - Context Map
 - Validation Gates
 - Stop Conditions
 - Rollback Notes
+
+FAST and Quick Story use inline stop conditions only — no formal artifacts required.
 
 Stop instead of guessing when:
 
@@ -418,9 +451,9 @@ When a stop condition triggers, ask for the missing decision or artifact instead
 
 ## Context Efficiency
 
-Stories should keep implementation context small by targeting discovery up front.
+Context consumption is controlled at three levels.
 
-Each generated story includes a `Context Scope` with:
+**Story level** — every story includes a `Context Scope`:
 
 - known relevant files or directories
 - search anchors to run before opening broad folders
@@ -428,12 +461,19 @@ Each generated story includes a `Context Scope` with:
 - whether `$agent-context-scout` is needed
 - an initial context budget
 
-Use `$agent-context-scout` for broad, ambiguous, cross-module, or high-risk stories. It produces a short Context Map and does not modify files.
+**Mode level** — each mode has a different reading strategy:
+
+- FAST/Quick: reads only the story folder, starts implementation immediately
+- STANDARD: orchestrator does one upfront read of all docs, then `implement-slice` starts from the Context Map only — no repeated full reads
+- STRICT: all agents read all docs
+
+**Agent level** — `$agent-context-scout` does targeted pre-implementation discovery for broad, ambiguous, cross-module, or high-risk stories. It produces a compact Context Map and does not modify files.
 
 ## Skill Selection
 
 Prefer macro skills for daily work:
 
+- `quick-story`: isolated changes — no orchestration, no formal artifacts
 - `plan-epic`: create an epic and implementation-ready stories
 - `run-story`: execute one story with `FAST`, `STANDARD`, or `STRICT`
 - `run-story-secure`: execute one security-sensitive story
