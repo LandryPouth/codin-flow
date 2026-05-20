@@ -5,20 +5,15 @@ description: Composite workflow to execute one story end-to-end with an intensit
 
 # Run Story
 
-## Overview
+Use `run-story-secure` instead when the story touches auth, permissions, admin surfaces, user input, persistence, external integrations, secrets, payments, uploads, or sensitive data. For isolated small changes, prefer `$quick-story`.
 
-Run one prepared story through the appropriate execution pipeline.
+## Artifact Contracts By Mode
 
-This is the daily-driver workflow. It prevents manual chaining of the atomic skills while preserving their roles and avoiding unnecessary process for small work.
-
-Use `run-story-secure` instead when the story touches auth, permissions, admin surfaces, user input, persistence, external integrations, secrets, payments, uploads, or sensitive data.
-
-## Conventions
-
-- `{project-root}` means the current repository root.
-- The active story should live under `epics/epic-NN-name/story-NN-NN-name/`.
-- Atomic skills remain authoritative for their own phase.
-- If a phase finds blocking issues, fix them before continuing.
+| Mode | Reads | Required Artifacts | Traceability |
+|---|---|---|---|
+| FAST | story folder only (implement-slice) | none — inline stop conditions | impl-notes if non-trivial |
+| STANDARD | all docs via orchestrator; implement-slice starts from Context Map only | Execution Packet + Context Map + Gates | impl-notes always; decisions if tradeoff |
+| STRICT | all docs by all agents | all artifacts | both always required |
 
 ## Choose Intensity
 
@@ -38,9 +33,6 @@ Pipeline:
 
 1. Use `$implement-slice`.
 2. Use lightweight `$tests-check`.
-3. Use `$blueprint-implementation-notes`.
-
-FAST mode may use a lightweight inline Execution Packet, but it still needs explicit Stop Conditions and Rollback Notes before editing.
 
 ### STANDARD
 
@@ -53,7 +45,7 @@ Use for:
 
 Pipeline:
 
-1. Use `$agent-orchestrator` to create the Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
+1. Use `$agent-orchestrator` to create the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
 2. Use `$implement-slice` to implement the story end-to-end.
 3. Use `$tests-check` to validate test adequacy.
 4. Use `$architecture-check` to validate architecture quickly.
@@ -78,7 +70,7 @@ Use for:
 Pipeline:
 
 1. Use `$agent-planner` or `$grill-me` if requirements are unclear.
-2. Use `$agent-orchestrator` to create the Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
+2. Use `$agent-orchestrator` to create the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
 3. Use `$tdd` for critical logic.
 4. Use `$implement-slice`.
 5. Use `$tests-check`.
@@ -94,6 +86,7 @@ Pipeline:
 - Escalate from `$architecture-check` to `$agent-validator-architecture` when the story introduces new patterns, crosses modules, or includes a refactor.
 - Escalate from `$tests-check` to `$agent-validator-tests` when tests are complex, flaky, missing for risky logic, or release-sensitive.
 - Switch to `$run-story-secure` when security-sensitive behavior appears during implementation.
+- Use `$agent-context-scout` before implementation when the story is broad, ambiguous, cross-module, high-risk, or marked `Scout needed: yes`.
 
 ## Stop Conditions
 
@@ -106,7 +99,7 @@ Pipeline:
 - Existing architecture conflicts with the requested implementation.
 - Story acceptance criteria are incomplete or not testable.
 
-## Rollback Notes
+## Rollback Notes (STANDARD / STRICT only)
 
 Before implementation, capture:
 
@@ -131,6 +124,7 @@ FAST / STANDARD / STRICT
 ## Pipeline Status
 
 - Orchestration:
+- Context Map:
 - Implementation:
 - Tests check:
 - Architecture check:

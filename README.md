@@ -33,26 +33,33 @@ plan -> write stories -> run a story -> validate -> document what happened
 Inside the project you want to equip:
 
 ```bash
-npx ai-native-coding-flow init
+npx github:LandryPouth/codin-flow init
 ```
 
 Then verify the installation:
 
 ```bash
-npx ai-native-coding-flow doctor
+npx github:LandryPouth/codin-flow doctor
+```
+
+To install from a specific branch or tag:
+
+```bash
+npx github:LandryPouth/codin-flow#main init
+npx github:LandryPouth/codin-flow#v0.1.0 init
 ```
 
 If you installed the package globally or linked it locally:
 
 ```bash
-ai-flow init
-ai-flow doctor
+coding-flow init
+coding-flow doctor
 ```
 
 Existing files are skipped by default. Use this only when you intentionally want to overwrite installed workflow files:
 
 ```bash
-ai-flow init --force
+coding-flow init --force
 ```
 
 ## What Gets Installed
@@ -60,6 +67,7 @@ ai-flow init --force
 ```txt
 .claude/
   skills/
+    agent-context-scout/
     agent-orchestrator/
     agent-planner/
     agent-worker-fullstack/
@@ -77,6 +85,7 @@ ai-flow init --force
     blueprint-implementation-notes/
 
     plan-epic/
+    quick-story/
     run-story/
     run-story-secure/
 
@@ -169,7 +178,13 @@ Use $plan-epic to turn this product idea into the first shippable epic and stori
 
 ### Run A Story
 
-Use one of the intensity modes.
+For isolated small changes (single file, copy, simple bug), use the lightweight workflow:
+
+```txt
+Use $quick-story for story-01-01.
+```
+
+For everything else, use one of the intensity modes:
 
 ```txt
 Use $run-story in FAST mode for story-01-01.
@@ -193,6 +208,38 @@ Use $run-story-secure for story-01-01.
 
 Use the lightest mode that protects the story's risk.
 
+Each mode has an explicit contract for what gets read, what artifacts are required, and what traceability is expected.
+
+| Mode | Reads | Required Artifacts | Traceability |
+|---|---|---|---|
+| **QUICK** | story.md + Context Scope only | none | impl-notes if non-trivial |
+| **FAST** | story folder only | none — inline stop conditions | impl-notes if non-trivial |
+| **STANDARD** | all docs via orchestrator; implement-slice starts from Context Map | Execution Packet + Context Map + Gates | impl-notes always; decisions if tradeoff |
+| **STRICT** | all docs by all agents | all artifacts | both always required |
+
+### Quick Story
+
+Use for isolated, bounded changes that need no orchestration:
+
+- single-file edits
+- copy or text updates
+- simple bug fixes with a clear edit point
+
+Pipeline:
+
+```txt
+implement-slice (story.md + Context Scope only)
+-> tests-check
+```
+
+Stop and switch to FAST or STANDARD if scope is larger than expected.
+
+Example:
+
+```txt
+Use $quick-story for story-02-01.
+```
+
 ### FAST
 
 Use for:
@@ -206,9 +253,8 @@ Use for:
 Pipeline:
 
 ```txt
-implement-slice
+implement-slice (story folder only)
 -> lightweight tests-check
--> implementation-notes
 ```
 
 Example:
@@ -229,8 +275,8 @@ Use for:
 Pipeline:
 
 ```txt
-agent-orchestrator
--> implement-slice
+agent-orchestrator (reads all docs once, produces Context Map)
+-> implement-slice (starts from Context Map only)
 -> tests-check
 -> architecture-check
 -> review-codebase
@@ -270,7 +316,7 @@ planner/grill if needed
 -> security-check
 -> review-codebase
 -> fix loop
--> implementation-notes
+-> implementation-notes + decisions
 ```
 
 Example:
@@ -381,12 +427,15 @@ implementation-notes.md = what actually happened
 
 ## Stop Conditions
 
-Every story execution should define:
+STANDARD and STRICT stories must define before implementation begins:
 
 - Execution Packet
+- Context Map
 - Validation Gates
 - Stop Conditions
 - Rollback Notes
+
+FAST and Quick Story use inline stop conditions only — no formal artifacts required.
 
 Stop instead of guessing when:
 
@@ -400,16 +449,38 @@ Stop instead of guessing when:
 
 When a stop condition triggers, ask for the missing decision or artifact instead of forcing progress.
 
+## Context Efficiency
+
+Context consumption is controlled at three levels.
+
+**Story level** — every story includes a `Context Scope`:
+
+- known relevant files or directories
+- search anchors to run before opening broad folders
+- files or areas to avoid unless needed
+- whether `$agent-context-scout` is needed
+- an initial context budget
+
+**Mode level** — each mode has a different reading strategy:
+
+- FAST/Quick: reads only the story folder, starts implementation immediately
+- STANDARD: orchestrator does one upfront read of all docs, then `implement-slice` starts from the Context Map only — no repeated full reads
+- STRICT: all agents read all docs
+
+**Agent level** — `$agent-context-scout` does targeted pre-implementation discovery for broad, ambiguous, cross-module, or high-risk stories. It produces a compact Context Map and does not modify files.
+
 ## Skill Selection
 
 Prefer macro skills for daily work:
 
+- `quick-story`: isolated changes — no orchestration, no formal artifacts
 - `plan-epic`: create an epic and implementation-ready stories
 - `run-story`: execute one story with `FAST`, `STANDARD`, or `STRICT`
 - `run-story-secure`: execute one security-sensitive story
 
 Use atomic skills when you need control over one phase:
 
+- `agent-context-scout`: produce a compact Context Map before broad or risky implementation
 - `grill-me`: clarify requirements
 - `write-story`: create a story folder
 - `implement-slice`: implement one vertical slice
@@ -472,33 +543,15 @@ To test the package as a global command:
 
 ```bash
 npm link
-ai-flow init --dry-run
-ai-flow doctor
+coding-flow init --dry-run
+coding-flow doctor
 ```
 
-## Publishing To npm
-
-Pick a unique package name in `package.json`. If you publish under your npm user or organization scope, use a scoped name:
-
-```json
-{
-  "name": "@your-scope/ai-native-coding-flow"
-}
-```
-
-Then run:
-
-```bash
-npm login
-npm pack --dry-run
-npm publish --access public
-```
-
-Use `--access public` for the first publish of a public scoped package.
+This workflow is intended to be installed from GitHub, not published to npm.
 
 ## Roadmap
 
-- `ai-flow add-epic`
-- `ai-flow add-story`
+- `coding-flow add-epic`
+- `coding-flow add-story`
 - smarter merge behavior for existing docs
-- `ai-flow doctor --fix`
+- `coding-flow doctor --fix`

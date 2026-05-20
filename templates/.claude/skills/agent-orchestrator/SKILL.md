@@ -5,29 +5,16 @@ description: Activate the orchestrator agent for one vertical story. Use when wo
 
 # Agent Orchestrator
 
-## Overview
-
-You are the story execution conductor. Your job is to turn a prepared story into a short, reliable execution sequence for Codex, then route the result through the right validation gates.
-
-You do not create bureaucracy. You reduce ambiguity until implementation can happen in one focused pass.
-
-## Conventions
-
-- `{project-root}` means the current repository root.
-- Bare paths resolve from `{project-root}` unless explicitly noted.
-- Story paths follow `epics/epic-NN-name/story-NN-NN-name/`.
-- Prefer existing project conventions over generic architecture advice.
-- If required files are missing, create a minimal recovery plan instead of stopping immediately.
-
 ## On Activation
 
 1. Identify the active epic and story from the user request or current context.
 2. Load the required inputs below.
 3. Summarize the story in one paragraph.
-4. Classify risk: `low`, `medium`, or `high`.
-5. Select worker and validators.
-6. Produce the Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
-7. Stop and wait unless the user explicitly asked you to proceed with implementation.
+4. Extract or create a compact Context Map from the story `Context Scope`.
+5. Classify risk: `low`, `medium`, or `high`.
+6. Select worker and validators.
+7. Produce the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
+8. Stop and wait unless the user explicitly asked you to proceed with implementation.
 
 ## Required Inputs
 
@@ -38,6 +25,16 @@ You do not create bureaucracy. You reduce ambiguity until implementation can hap
 - `docs/conventions.md`
 - Active epic `index.md`
 - Active story folder
+
+## Context Map Rules
+
+Build the Context Map from the story `Context Scope`. If absent, derive a minimal one from story, tasks, tests, and epic index.
+
+Use `$agent-context-scout` only when the story marks `Scout needed: yes` or implementation would otherwise require broad exploration. The scout must not modify files.
+
+Keep the Context Map short: relevant files and why they matter, search anchors, likely edit points, risks, areas to avoid, initial context budget.
+
+If the edit point is still unclear after the budgeted discovery, stop and report before reading more.
 
 ## Risk Routing
 
@@ -65,22 +62,7 @@ If a stop condition is triggered, do not proceed with implementation. Report the
 
 ## Rollback Notes
 
-Every Execution Packet must describe how to revert or contain the change if validation fails.
-
-Include:
-
-- Files or areas likely to change.
-- Data/schema migration rollback notes if relevant.
-- Feature flag or config rollback notes if relevant.
-- Manual rollback or cleanup steps if automation is not available.
-
-## Responsibilities
-
-- Identify scope, dependencies, risks, and required validators.
-- Create or refine the execution plan.
-- Select the correct worker skill.
-- Route validation to architecture, tests, and security checks as needed.
-- Keep the story vertical and shippable.
+Describe how to revert or contain the change if validation fails: files likely to change, data/schema rollback if relevant, config/feature-flag rollback if relevant, manual cleanup steps.
 
 ## Rules
 
@@ -120,6 +102,27 @@ Excluded:
 1. 
 2. 
 3. 
+
+## Context Map
+
+Relevant files:
+- 
+
+Search anchors:
+-
+
+Likely edit points:
+-
+
+Risks:
+-
+
+Avoid unless needed:
+-
+
+Initial context budget:
+- Max files before edit plan:
+- Stop after:
 
 ## Validation Gates
 

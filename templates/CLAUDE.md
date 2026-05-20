@@ -12,6 +12,7 @@ A portable mirror is also installed in `.agents/skills/` for Codex and other age
 Prefer the macro workflows for daily work:
 
 - `$plan-epic`
+- `$quick-story` — isolated changes, no orchestration
 - `$run-story`
 - `$run-story-secure`
 

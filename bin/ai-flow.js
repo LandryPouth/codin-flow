@@ -96,6 +96,7 @@ function copyTemplates({ force = false, dryRun = false } = {}) {
 function doctor() {
   const skillNames = [
     "agent-orchestrator",
+    "agent-context-scout",
     "agent-planner",
     "agent-worker-fullstack",
     "agent-worker-tests",
@@ -103,6 +104,7 @@ function doctor() {
     "agent-validator-tests",
     "agent-validator-security",
     "plan-epic",
+    "quick-story",
     "run-story",
     "run-story-secure",
     "grill-me",
@@ -155,9 +157,9 @@ function printHelp() {
   log(`Coding Flow
 
 Usage:
-  ai-flow init [--force] [--dry-run]
-  ai-flow doctor
-  ai-flow help
+  coding-flow init [--force] [--dry-run]
+  coding-flow doctor
+  coding-flow help
 
 Commands:
   init      Install Claude/Codex workflow files into the current project.
@@ -193,5 +195,5 @@ if (command === "init") {
 } else if (command === "help" || command === "--help" || command === "-h") {
   printHelp();
 } else {
-  fail(`unknown command "${command}". Run "ai-flow help".`);
+  fail(`unknown command "${command}". Run "coding-flow help".`);
 }
