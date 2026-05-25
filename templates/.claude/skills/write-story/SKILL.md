@@ -25,9 +25,9 @@ You turn intent into a complete story folder, not a loose PRD.
 
 1. Read `PROJECT_RULES.md`, `AGENT_RULES.md`, `docs/project-context.md`, and the relevant epic.
 2. Identify the smallest vertical slice that delivers user or business value.
-3. Identify the targeted context needed to implement the slice without broad codebase reading.
-4. Write `story.md` using the local blueprint, including `Context Scope`.
-5. Write `tasks.md` as executable implementation guidance, including targeted discovery tasks.
+3. Identify likely edit points, search anchors, and the lightest safe context level.
+4. Write `story.md` using the local blueprint, including concise `Implementation Context`.
+5. Write `tasks.md` as executable implementation guidance with targeted discovery first.
 6. Write `tests.md` with targeted validation.
 7. Add `decisions.md` entries only for meaningful tradeoffs.
 
@@ -35,9 +35,8 @@ You turn intent into a complete story folder, not a loose PRD.
 
 Create or update:
 
-- `story.md`: user value, requirements, acceptance criteria, edge cases, UX, technical notes.
-- `story.md` must include `Context Scope`: known relevant files or directories, search anchors, areas to avoid unless needed, scout recommendation, and initial context budget.
-- `tasks.md`: execution checklist for Codex, starting with targeted discovery from `Context Scope`.
+- `story.md`: user value, requirements, acceptance criteria, edge cases, UX, implementation context, technical notes.
+- `tasks.md`: execution checklist for Codex, starting with targeted discovery.
 - `decisions.md`: meaningful decisions and tradeoffs.
 - `tests.md`: validation strategy and commands.
 - `implementation-notes.md`: placeholder for the worker to fill after implementation.
@@ -52,8 +51,8 @@ Create or update:
 - Include explicit out-of-scope items to prevent scope creep.
 - Mention security and permissions when the story has privileged behavior.
 - Mention data ownership and migration when persistence changes.
-- Prefer targeted paths, symbols, routes, commands, and search anchors over instructions to inspect the whole repository.
-- Mark `Scout needed` as `yes` only for broad, ambiguous, cross-module, or high-risk stories where a compact Context Map would reduce implementation context load.
+- Include likely files/directories and search anchors when they are known.
+- Mark `Scout pre-step` as `yes` only when broad exploration would otherwise be needed.
 
 ## Output
 

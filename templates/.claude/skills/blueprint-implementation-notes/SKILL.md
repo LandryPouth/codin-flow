@@ -22,17 +22,22 @@ Do not move implementation logs into `docs/project-context.md`; only summarize d
 
 ## Update Workflow
 
-1. Summarize implemented behavior.
-2. List changed files.
-3. Record validation commands and results.
-4. Record validator outcomes.
-5. Document issues encountered.
-6. Capture follow-ups and remaining risks.
+1. Set story status.
+2. Summarize implemented behavior.
+3. List changed files.
+4. Record validation commands and results.
+5. Record validator outcomes.
+6. Document issues encountered.
+7. Capture follow-ups and remaining risks.
 
 ## Template
 
 ```md
 # Implementation Notes - Story NN.NN
+
+## Status
+
+planned / in-progress / blocked / done
 
 ## Summary
 
@@ -85,3 +90,5 @@ Notes:
 - Do not hide unrelated failures.
 - Do not mark validation pass unless the command actually passed.
 - Include enough file detail for a reviewer to navigate quickly.
+- Use `done` only when acceptance criteria are satisfied and relevant validation is complete.
+- Use `blocked` when a stop condition prevents completion.

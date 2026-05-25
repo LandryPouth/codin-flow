@@ -21,7 +21,7 @@ Tasks should guide implementation and validation without turning the story into 
 ## Generation Workflow
 
 1. Read `story.md` and `tests.md`.
-2. Convert the story `Context Scope` into targeted discovery tasks.
+2. Turn `Implementation Context` into targeted discovery tasks.
 3. Identify code areas and existing patterns to inspect.
 4. Break implementation into 3-7 meaningful steps.
 5. Add testing tasks mapped to risk.
@@ -33,23 +33,15 @@ Tasks should guide implementation and validation without turning the story into 
 ```md
 # Tasks - Story NN.NN
 
-## Pre-Implementation (FAST)
-
-- [ ] Read story.md and Context Scope
-- [ ] Run the listed `Search first` queries
-- [ ] Read only the listed `Known relevant files or directories` until the edit point is clear
-- [ ] Confirm story scope
-
-## Pre-Implementation (STANDARD / STRICT)
+## Pre-Implementation
 
 - [ ] Read `PROJECT_RULES.md`
 - [ ] Read `AGENT_RULES.md`
-- [ ] Read `docs/project-context.md` (if story touches architecture)
-- [ ] Read epic `index.md`
-- [ ] Read the story `Context Scope`
-- [ ] Run the listed `Search first` queries before opening broad directories
-- [ ] Read only the listed `Known relevant files or directories` until the edit point is clear
-- [ ] If `Scout needed` is `yes`, request or produce a compact Context Map before implementation
+- [ ] Read story `Implementation Context`
+- [ ] Read epic `index.md` only if scope, dependencies, or sequencing are unclear
+- [ ] Read project docs only when the context level or risk requires them
+- [ ] Run listed search anchors before opening broad directories
+- [ ] Stop and use `$agent-context-scout` if edit points remain unclear after the context budget
 - [ ] Confirm story scope
 
 ## Implementation Tasks
@@ -88,6 +80,5 @@ Tasks should guide implementation and validation without turning the story into 
 - Do not split by architecture layer unless that is the actual delivery order.
 - Include "inspect existing pattern" tasks when the codebase has conventions.
 - Include rollback or migration tasks when data changes are involved.
-- Include targeted discovery tasks derived from `Context Scope`.
-- Do not add tasks that require broad repository review unless the story explicitly justifies it.
-- If the implementation needs more context than budgeted, add a task to stop, summarize findings, and justify the extra files to inspect.
+- Prefer targeted discovery tasks over broad "inspect the codebase" tasks.
+- Keep the task list one-shot friendly: discovery, implementation, tests, validation, notes.

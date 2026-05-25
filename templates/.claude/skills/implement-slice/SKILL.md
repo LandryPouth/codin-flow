@@ -21,41 +21,36 @@ The success condition is not "code changed"; it is "acceptance criteria are sati
 
 ## Before Coding
 
-Read based on intensity mode. If mode is not specified, use STANDARD.
-
-**FAST**: story folder files only (story.md and Context Scope at minimum).
-
-**STANDARD**: the orchestrator has already read all docs and produced a Context Map — start from the Context Map and read only the targeted files it lists. Read epic `index.md` + story folder files if no Context Map is present.
-
-**STRICT**: `PROJECT_RULES.md`, `AGENT_RULES.md`, `docs/project-context.md`, `docs/architecture.md`, `docs/conventions.md`, epic `index.md`, all story folder files.
-
-Then confirm:
-- **FAST**: story has a Context Scope or clear known edit points.
-- **STANDARD/STRICT**: story has Context Scope or Context Map, Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
+1. Read `PROJECT_RULES.md`.
+2. Read `AGENT_RULES.md`.
+3. Read the active story folder.
+4. Read the Execution Packet or inline packet when present.
+5. Read the epic `index.md` only when scope, sequencing, or dependencies are unclear.
+6. Read `docs/project-context.md`, `docs/architecture.md`, or `docs/conventions.md` only when the story risk or packet requires them.
+7. Confirm non-quick work has an Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
 
 ## Implementation Strategy
 
-1. Map acceptance criteria to code areas using `Context Scope` or `Context Map`.
-2. Run the listed search anchors before opening broad directories.
-3. Read known relevant files first and stop when the edit point is clear.
-4. Inspect current patterns before editing.
-5. If business logic is involved, consider `$tdd`.
-6. If UI is involved, preserve existing interaction and visual conventions.
-7. If auth, admin, permissions, external input, or persistence is involved, plan `$security-check`.
-8. Make the smallest coherent change.
-9. Validate and repair.
+1. Map acceptance criteria to code areas using the Context Map, story technical notes, or targeted search anchors.
+2. Run targeted searches before opening broad directories.
+3. Inspect current patterns before editing.
+4. If business logic is involved, consider `$tdd`.
+5. If UI is involved, preserve existing interaction and visual conventions.
+6. If auth, admin, permissions, external input, or persistence is involved, plan `$security-check`.
+7. Make the smallest coherent change.
+8. Validate and repair.
 
 ## Execution Rules
 
 - Implement only the story scope.
 - Preserve existing architecture unless the story explicitly changes it.
 - Prefer existing patterns and helper APIs.
-- Do not broadly scan the repository when targeted search anchors or known relevant files are available.
-- If the initial context budget is exceeded before the edit point is clear, stop, summarize findings, and justify any extra files to inspect.
-- Use `$agent-context-scout` for broad, ambiguous, cross-module, or high-risk stories instead of loading large amounts of code into context.
+- Keep implementation one-shot once the edit points are clear: code, tests, validation, and notes should happen in one focused pass.
+- Do not load broad project context when targeted files, search anchors, or a Context Map are enough.
+- If more than 8 files or 5 searches are needed before edit points are clear, stop and switch to `$agent-context-scout` unless the mode is STRICT.
 - Add or update tests according to `tests.md`.
-- **FAST**: update `implementation-notes.md` only for non-trivial changes; skip `decisions.md` unless a real tradeoff occurred.
-- **STANDARD/STRICT**: update `implementation-notes.md` always; update `decisions.md` for any meaningful architecture choice.
+- Record meaningful architecture choices in `decisions.md`.
+- Update `implementation-notes.md` after execution.
 
 ## Validation
 
@@ -85,9 +80,9 @@ Then confirm:
 
 ## Context Used
 
-- Context Scope/Map followed: yes/no
-- Extra files inspected beyond budget:
-- Reason:
+- Context level: QUICK / FAST / STANDARD / STRICT
+- Search anchors:
+- Extra files beyond packet:
 
 ## Tests And Validation
 

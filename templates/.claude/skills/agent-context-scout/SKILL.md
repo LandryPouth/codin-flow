@@ -13,6 +13,8 @@ Your job is to identify the smallest useful implementation context, not to under
 
 You produce a compact Context Map that lets the implementation agent start from targeted files, symbols, routes, commands, and risks.
 
+The goal is to preserve one-shot implementation while keeping the main implementation context clean.
+
 ## Conventions
 
 - `{project-root}` means the current repository root.
@@ -21,12 +23,12 @@ You produce a compact Context Map that lets the implementation agent start from 
 - Prefer `rg` or targeted file reads over directory-wide inspection.
 - Do not edit files.
 - Do not spawn subagents.
+- Do not write a broad audit. Return only the context needed for the next implementation pass.
 
 ## When To Use
 
 Use this skill when:
 
-- the story marks `Scout needed: yes`
 - likely edit points are unclear
 - the story crosses modules or layers
 - the story is security-sensitive, migration-heavy, or high regression risk
@@ -34,28 +36,33 @@ Use this skill when:
 
 Do not use this skill for:
 
-- small FAST stories
+- small FAST stories or `$quick-story` changes
 - copy-only or isolated UI changes
 - stories that already name clear edit points and validation commands
 
 ## Workflow
 
-1. Read the active story folder files.
-2. Read the parent epic `index.md`.
-3. Read only project docs needed to understand boundaries.
-4. Start with the story `Context Scope`.
-5. Run targeted searches listed under `Search first`.
-6. Read only files needed to identify likely edit points and validation focus.
-7. Stop once the implementation agent has enough context to plan edits.
+1. Read the active story folder files and the parent epic `index.md`.
+2. Read only project docs needed to understand module boundaries.
+3. Run targeted searches for the symbols, routes, and files most relevant to the story.
+4. Read only the files needed to identify likely edit points and validation focus.
+5. Stop once the implementation agent has enough context to plan edits without broad exploration.
+
+Default budget:
+
+- Max searches: 8
+- Max files read: 12
+- Max output: about one screen
 
 ## Rules
 
 - Keep output short and actionable.
+- Prefer file paths, symbols, commands, and risks over prose.
 - Prefer paths and search anchors over broad summaries.
 - Mark uncertain findings as assumptions.
 - Include risks that affect validation, rollback, security, or architecture.
-- Include areas to avoid when they look adjacent but outside scope.
-- If the edit point is still unclear after targeted discovery, say so directly and recommend the next two searches or files only.
+- Include areas to avoid when they look adjacent but are outside scope.
+- If the edit point is still unclear after targeted discovery, say so and recommend the next two searches or files only.
 
 ## Output
 
@@ -73,7 +80,7 @@ Do not use this skill for:
 
 ## Search Anchors
 
-- `symbol|string/route/command` - what it should reveal
+- `symbol|route|command` - what it should reveal
 
 ## Likely Edit Points
 
@@ -81,11 +88,11 @@ Do not use this skill for:
 
 ## Validation Focus
 
-- 
+-
 
 ## Risks
 
-- 
+-
 
 ## Avoid Unless Needed
 

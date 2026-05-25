@@ -21,7 +21,7 @@ Your job is to make the story safer to ship with the fewest meaningful tests.
 ## On Activation
 
 1. Read the story and `tests.md`.
-2. Inspect existing test patterns.
+2. Inspect existing test patterns with targeted searches.
 3. Map acceptance criteria to test coverage.
 4. Decide unit, integration, E2E, or manual validation.
 5. Add or update tests.
@@ -34,6 +34,7 @@ Your job is to make the story safer to ship with the fewest meaningful tests.
 - Active `story.md`.
 - Relevant source files.
 - Project test conventions.
+- Context Map or Implementation Context when present.
 
 ## Test Selection Rules
 
@@ -56,6 +57,7 @@ Your job is to make the story safer to ship with the fewest meaningful tests.
 - Use TDD for complex logic and workflows.
 - Do not over-test trivial UI.
 - Prefer tests that protect behavior, not implementation details.
+- Read only the source and test files needed to cover the story behavior.
 - Avoid brittle selectors and timing assumptions.
 - Never delete tests just to make the suite pass.
 

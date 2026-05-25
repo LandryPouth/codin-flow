@@ -1,44 +1,79 @@
 # Project Context
 
-This file is the current state map of the project. Keep it controlled, current, and scannable.
+This file is the durable state map of the project.
 
-Do not use this file as a dump for story decisions or implementation logs.
+Keep it current, compact, and useful for future agents. Do not use it as a scratchpad, audit dump, story decision log, or implementation log.
+
+## How To Fill This File
+
+- Prefer short, factual bullets.
+- Record current reality, not hopes or temporary plans.
+- Move detailed story tradeoffs to `epics/.../decisions.md`.
+- Move execution history to `epics/.../implementation-notes.md`.
+- Update this file only when the durable product or architecture context changes.
+
+Example level of detail:
+
+```txt
+The app is a B2B dashboard for managing customer invoices. Admins can create customers and invoices. Customers can view invoices through a private portal. The current implementation uses static invoice data and needs migration toward persisted, admin-managed records.
+```
 
 ## Product Summary
 
-[What the product is, who it serves, and why it exists.]
+[2-4 sentences: what the product is, who it serves, and why it exists.]
 
 ## Current State
 
-[Current implementation, static/dynamic status, known limitations.]
+- What is implemented:
+- What is static or mocked:
+- What is dynamic or persisted:
+- Known limitations:
 
-## Target Architecture
+## Target Direction
 
-[Desired architecture direction and important boundaries.]
+- Product direction:
+- Architecture direction:
+- What should stay stable:
+- What is expected to change:
 
 ## Core Domains
 
 - Domain:
+  - Owns:
+  - Key rules:
 - Domain:
+  - Owns:
+  - Key rules:
 
 ## Data Model
 
-[Core entities, relationships, and ownership.]
+- Entity:
+  - Owner:
+  - Important fields:
+  - Relationships:
+- Entity:
+  - Owner:
+  - Important fields:
+  - Relationships:
 
 ## User Roles
 
 - Role:
+  - Can:
+  - Cannot:
 - Role:
+  - Can:
+  - Cannot:
 
 ## Important Workflows
 
-### Workflow 1
+### Workflow Name
 
-[Description.]
-
-### Workflow 2
-
-[Description.]
+- Actor:
+- Trigger:
+- Main path:
+- Failure states:
+- Validation:
 
 ## Technical Constraints
 
@@ -54,7 +89,11 @@ Do not use this file as a dump for story decisions or implementation logs.
 ## Known Risks
 
 - Risk:
+  - Impact:
+  - Mitigation:
 - Risk:
+  - Impact:
+  - Mitigation:
 
 ## Current Roadmap
 
@@ -62,13 +101,13 @@ Do not use this file as a dump for story decisions or implementation logs.
 - Next:
 - Later:
 
-## Decisions Log Summary
+## Decisions Summary
 
-[Short summary of important decisions only. Detailed decisions belong in story-level `decisions.md`.]
+[Short summary of durable decisions only. Detailed decisions belong in story-level `decisions.md`.]
 
 ## Agent Notes
 
-- `project-context.md` = current state of the project.
+- `project-context.md` = durable current state of the project.
 - `decisions.md` = detailed decisions for a story.
 - `implementation-notes.md` = what was actually implemented.
-- Keep this file dense, not verbose.
+- Keep this file dense, scannable, and stable.

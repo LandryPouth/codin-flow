@@ -25,8 +25,8 @@ The story should describe product behavior, not an internal engineering checklis
 3. Identify who benefits and how.
 4. Convert requirements into observable behavior.
 5. Add edge cases that affect correctness, security, UX, or data.
-6. Add technical notes that guide architecture without overdesigning.
-7. Add a context-efficient `Context Scope` that targets discovery before implementation.
+6. Add a lightweight Implementation Context so Codex can find edit points without broad exploration.
+7. Add technical notes that guide architecture without overdesigning.
 8. Mark out-of-scope boundaries explicitly.
 
 ## Template
@@ -46,23 +46,22 @@ The story should describe product behavior, not an internal engineering checklis
 
 [Relevant context from project-context, epic, existing code.]
 
-## Context Scope
+## Implementation Context
 
-Known relevant files or directories:
-- `[path]` - [why this is likely relevant]
+Likely files or directories:
+- `[path]` - [why it is probably relevant]
 
-Search first:
-- `[symbol|string/route/command]` - [why this should find the edit point]
+Search anchors:
+- `[symbol|string/route/command]` - [what it should reveal]
+
+Execution mode:
+- `QUICK / FAST / STANDARD / STRICT`
+
+Scout pre-step:
+- `yes/no` - [yes only when edit points are unclear or broad discovery would otherwise be needed]
 
 Avoid unless needed:
-- `[path/glob]` - [why this is probably outside the story]
-
-Scout needed:
-- `yes/no` - [yes only for broad, ambiguous, cross-module, or high-risk stories]
-
-Initial context budget:
-- Max files to read before planning edits: [number]
-- Stop and summarize if the likely edit point is still unclear after: [number] searches or file reads
+- `[path/glob]` - [why it is probably outside this story]
 
 ## Requirements
 
@@ -105,6 +104,5 @@ Initial context budget:
 - Include permission expectations when relevant.
 - Include empty states, loading states, and failure states for user-facing work.
 - Include data migration or compatibility notes when existing data is affected.
-- Include `Context Scope` for every story, even if some entries are tentative.
-- Prefer targeted paths, symbols, routes, commands, and search anchors over broad codebase reading.
-- Set `Scout needed` to `yes` only when a compact context map would prevent broad exploration during implementation.
+- Include `Implementation Context` in every story. Keep it concise: target paths, search anchors, execution mode, scout pre-step, and avoid list.
+- Mark `Scout pre-step` as `yes` only when edit points are unclear or broad codebase exploration would otherwise be needed.

@@ -5,12 +5,26 @@ description: Activate the orchestrator agent for one vertical story. Use when wo
 
 # Agent Orchestrator
 
+## Overview
+
+You are the story execution conductor. Your job is to turn a prepared story into a short, reliable execution sequence for Codex, then route the result through the right validation gates.
+
+You do not create bureaucracy. You reduce ambiguity until implementation can happen in one focused pass.
+
+## Conventions
+
+- `{project-root}` means the current repository root.
+- Bare paths resolve from `{project-root}` unless explicitly noted.
+- Story paths follow `epics/epic-NN-name/story-NN-NN-name/`.
+- Prefer existing project conventions over generic architecture advice.
+- If required files are missing, create a minimal recovery plan instead of stopping immediately.
+
 ## On Activation
 
 1. Identify the active epic and story from the user request or current context.
-2. Load the required inputs below.
+2. Load the minimum required inputs below.
 3. Summarize the story in one paragraph.
-4. Extract or create a compact Context Map from the story `Context Scope`.
+4. Build a compact Context Map from the story, tasks, tests, and targeted searches.
 5. Classify risk: `low`, `medium`, or `high`.
 6. Select worker and validators.
 7. Produce the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
@@ -20,21 +34,26 @@ description: Activate the orchestrator agent for one vertical story. Use when wo
 
 - `PROJECT_RULES.md`
 - `AGENT_RULES.md`
-- `docs/project-context.md`
-- `docs/architecture.md`
-- `docs/conventions.md`
-- Active epic `index.md`
 - Active story folder
+- Active epic `index.md` when dependencies, sequencing, or scope are unclear
+- `docs/project-context.md` when domain or current state matters
+- `docs/architecture.md` when boundaries, modules, data flow, or new patterns matter
+- `docs/conventions.md` when coding or UX conventions are unclear
 
 ## Context Map Rules
 
-Build the Context Map from the story `Context Scope`. If absent, derive a minimal one from story, tasks, tests, and epic index.
+The Context Map is the main anti-token-sprawl artifact.
 
-Use `$agent-context-scout` only when the story marks `Scout needed: yes` or implementation would otherwise require broad exploration. The scout must not modify files.
+It should identify:
 
-Keep the Context Map short: relevant files and why they matter, search anchors, likely edit points, risks, areas to avoid, initial context budget.
+- likely files or directories to inspect
+- search anchors to run first
+- likely edit points
+- validation focus
+- areas to avoid unless needed
+- context budget for implementation
 
-If the edit point is still unclear after the budgeted discovery, stop and report before reading more.
+Use `$agent-context-scout` only when the map cannot stay compact or edit points remain unclear after targeted searches. The scout must not modify files.
 
 ## Risk Routing
 
@@ -62,7 +81,22 @@ If a stop condition is triggered, do not proceed with implementation. Report the
 
 ## Rollback Notes
 
-Describe how to revert or contain the change if validation fails: files likely to change, data/schema rollback if relevant, config/feature-flag rollback if relevant, manual cleanup steps.
+Every Execution Packet must describe how to revert or contain the change if validation fails.
+
+Include:
+
+- Files or areas likely to change.
+- Data/schema migration rollback notes if relevant.
+- Feature flag or config rollback notes if relevant.
+- Manual rollback or cleanup steps if automation is not available.
+
+## Responsibilities
+
+- Identify scope, dependencies, risks, and required validators.
+- Create or refine the execution plan.
+- Select the correct worker skill.
+- Route validation to architecture, tests, and security checks as needed.
+- Keep the story vertical and shippable.
 
 ## Rules
 
@@ -87,10 +121,10 @@ Describe how to revert or contain the change if validation fails: files likely t
 ## Scope
 
 Included:
-- 
+-
 
 Excluded:
-- 
+-
 
 ## Worker
 
@@ -99,14 +133,14 @@ Excluded:
 
 ## Execution Sequence
 
-1. 
-2. 
-3. 
+1.
+2.
+3.
 
 ## Context Map
 
 Relevant files:
-- 
+-
 
 Search anchors:
 -
@@ -114,15 +148,16 @@ Search anchors:
 Likely edit points:
 -
 
-Risks:
+Validation focus:
 -
 
 Avoid unless needed:
 -
 
-Initial context budget:
-- Max files before edit plan:
-- Stop after:
+Context budget:
+- Max searches:
+- Max files:
+- Escalate to scout if:
 
 ## Validation Gates
 
@@ -132,7 +167,7 @@ Initial context budget:
 
 ## Stop Conditions
 
-- 
+-
 
 ## Rollback Notes
 
