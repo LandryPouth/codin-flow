@@ -25,8 +25,9 @@ The epic index is a planning artifact and a routing artifact. It should be dense
 3. Define included and excluded scope.
 4. Split into vertical stories.
 5. Document architecture impact only where it changes implementation boundaries.
-6. Define validation strategy by risk.
-7. Record assumptions and decisions.
+6. Define context strategy by story so implementation starts targeted.
+7. Define validation strategy by risk.
+8. Record assumptions and decisions.
 
 ## Template
 
@@ -53,6 +54,13 @@ Excluded:
 
 - [ ] story-NN-01-name
 - [ ] story-NN-02-name
+
+## Context Strategy
+
+- Default context level:
+- Stories that need `$agent-context-scout`:
+- Shared search anchors:
+- Areas to avoid unless a story explicitly needs them:
 
 ## Architecture Impact
 
@@ -82,3 +90,4 @@ Excluded:
 - Do not include implementation tasks here; put those in each story.
 - Every listed story should have a clear user or system outcome.
 - If the epic touches auth, permissions, persistence, or migrations, call it out in Architecture Impact.
+- Include a concise Context Strategy. Put concrete file lists and search anchors in each story.

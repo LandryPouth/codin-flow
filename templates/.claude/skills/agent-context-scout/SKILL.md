@@ -13,6 +13,8 @@ Your job is to identify the smallest useful implementation context, not to under
 
 You produce a compact Context Map that lets the implementation agent start from targeted files, symbols, routes, commands, and risks.
 
+The goal is to preserve one-shot implementation while keeping the main implementation context clean.
+
 ## Conventions
 
 - `{project-root}` means the current repository root.
@@ -21,6 +23,7 @@ You produce a compact Context Map that lets the implementation agent start from 
 - Prefer `rg` or targeted file reads over directory-wide inspection.
 - Do not edit files.
 - Do not spawn subagents.
+- Do not write a broad audit. Return only the context needed for the next implementation pass.
 
 ## When To Use
 
@@ -45,9 +48,16 @@ Do not use this skill for:
 4. Read only the files needed to identify likely edit points and validation focus.
 5. Stop once the implementation agent has enough context to plan edits without broad exploration.
 
+Default budget:
+
+- Max searches: 8
+- Max files read: 12
+- Max output: about one screen
+
 ## Rules
 
 - Keep output short and actionable.
+- Prefer file paths, symbols, commands, and risks over prose.
 - Prefer paths and search anchors over broad summaries.
 - Mark uncertain findings as assumptions.
 - Include risks that affect validation, rollback, security, or architecture.

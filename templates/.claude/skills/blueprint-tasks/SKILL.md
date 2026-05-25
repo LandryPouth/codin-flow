@@ -21,11 +21,12 @@ Tasks should guide implementation and validation without turning the story into 
 ## Generation Workflow
 
 1. Read `story.md` and `tests.md`.
-2. Identify code areas and existing patterns to inspect.
-3. Break implementation into 3-7 meaningful steps.
-4. Add testing tasks mapped to risk.
-5. Add validation commands.
-6. Add completion tasks for notes and decisions.
+2. Turn `Implementation Context` into targeted discovery tasks.
+3. Identify code areas and existing patterns to inspect.
+4. Break implementation into 3-7 meaningful steps.
+5. Add testing tasks mapped to risk.
+6. Add validation commands.
+7. Add completion tasks for notes and decisions.
 
 ## Template
 
@@ -36,8 +37,11 @@ Tasks should guide implementation and validation without turning the story into 
 
 - [ ] Read `PROJECT_RULES.md`
 - [ ] Read `AGENT_RULES.md`
-- [ ] Read `docs/project-context.md`
-- [ ] Read epic `index.md`
+- [ ] Read story `Implementation Context`
+- [ ] Read epic `index.md` only if scope, dependencies, or sequencing are unclear
+- [ ] Read project docs only when the context level or risk requires them
+- [ ] Run listed search anchors before opening broad directories
+- [ ] Stop and use `$agent-context-scout` if edit points remain unclear after the context budget
 - [ ] Confirm story scope
 
 ## Implementation Tasks
@@ -76,3 +80,5 @@ Tasks should guide implementation and validation without turning the story into 
 - Do not split by architecture layer unless that is the actual delivery order.
 - Include "inspect existing pattern" tasks when the codebase has conventions.
 - Include rollback or migration tasks when data changes are involved.
+- Prefer targeted discovery tasks over broad "inspect the codebase" tasks.
+- Keep the task list one-shot friendly: discovery, implementation, tests, validation, notes.

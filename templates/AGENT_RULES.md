@@ -13,12 +13,16 @@ Shared operating rules for Claude Code, Codex, and any specialized agents.
 
 ## Execution Flow
 
-- For large changes, read `docs/project-context.md`, `docs/architecture.md`, and `docs/conventions.md`.
-- For story work, read the epic `index.md` and every file in the story folder before coding.
+- Load the smallest context that can safely finish the work in one pass.
+- Start with the user request, active story, acceptance criteria, and targeted search anchors.
+- Read project docs only when the selected mode or risk requires them.
+- For story work, read the active story folder. Read the epic `index.md` when sequencing, scope, or dependencies are unclear.
+- Use targeted searches before opening broad directories.
 - Implement only the active story scope.
 - Update `implementation-notes.md` after execution.
 - Update `decisions.md` when a meaningful tradeoff is made.
-- Every story execution must define an Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes before implementation begins.
+- Every non-quick story execution must define an Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes before implementation begins.
+- Preserve one-shot delivery: once scope and edit points are clear, implement code, tests, validation, and notes in the same focused pass.
 
 ## Context Boundaries
 
@@ -27,6 +31,25 @@ Shared operating rules for Claude Code, Codex, and any specialized agents.
 - Story-level `decisions.md` stores detailed story decisions, tradeoffs, alternatives, and consequences.
 - Story-level `implementation-notes.md` stores what was actually changed, tests run, issues, follow-ups, and remaining risks.
 - Only update `project-context.md` when the project's current state, target architecture, domains, roles, workflows, constraints, risks, roadmap, or decision summary changes.
+
+## Context Ladder
+
+Use the lightest context level that protects the story.
+
+- `QUICK`: user request or `story.md`, direct target files, 1-3 searches, no formal artifacts.
+- `FAST`: story folder, targeted files, inline stop conditions and rollback notes, no orchestrator unless scope expands.
+- `STANDARD`: story folder, epic index as needed, compact Execution Packet, targeted Context Map, normal validation.
+- `STRICT`: required project docs, compact Context Map, security/architecture/test gates, deeper validators when risk justifies them.
+- `SCOUT`: use `$agent-context-scout` only when edit points are unclear, the story crosses modules, or broad reading would otherwise be needed.
+
+Context budget defaults:
+
+- `QUICK`: stop after 3 searches or 5 files if the edit point is still unclear.
+- `FAST`: stop after 5 searches or 8 files if the edit point is still unclear.
+- `STANDARD`: create or reuse a Context Map before implementation; use scout if the map cannot stay compact.
+- `STRICT`: read required docs, but still inspect implementation files through targeted searches first.
+
+If a context budget is exceeded, stop and summarize what is known before reading more.
 
 ## Composite Workflows
 
@@ -44,8 +67,8 @@ Use the lightest mode that protects the story's risk.
 
 Use for small UI changes, copy/text, simple bugs, isolated components, and low-risk local changes.
 
-- **Reads**: story folder files only.
-- **Artifacts**: none required — inline stop conditions suffice.
+- **Reads**: story folder plus targeted files. Read epic/docs only if scope or conventions are unclear.
+- **Artifacts**: no formal orchestration required; inline stop conditions and rollback notes suffice.
 - **Traceability**: `implementation-notes.md` only for non-trivial changes; skip `decisions.md` unless a real tradeoff occurred.
 
 Pipeline:
@@ -58,8 +81,8 @@ Pipeline:
 
 Use for normal CRUD, product features, frontend/backend integration, and ordinary vertical stories.
 
-- **Reads**: orchestrator reads all docs upfront; `implement-slice` reads epic index and story folder.
-- **Artifacts**: Execution Packet + Validation Gates + Stop Conditions + Rollback Notes.
+- **Reads**: story folder, targeted files, epic index when needed, project docs only when they affect the change.
+- **Artifacts**: compact Execution Packet + Context Map + Validation Gates + Stop Conditions + Rollback Notes.
 - **Traceability**: `implementation-notes.md` always; `decisions.md` for meaningful tradeoffs only.
 
 Pipeline:
@@ -75,8 +98,8 @@ Pipeline:
 
 Use for auth, admin, permissions, payments, DB migrations, risky refactors, security-sensitive work, enterprise workflows, and high-regression-risk changes.
 
-- **Reads**: all docs — `PROJECT_RULES.md`, `AGENT_RULES.md`, `project-context.md`, `architecture.md`, `conventions.md`, epic `index.md`, all story folder files.
-- **Artifacts**: all — Execution Packet + Validation Gates + Stop Conditions + Rollback Notes.
+- **Reads**: required docs, epic index, story folder, and targeted implementation files. Use scout when broad discovery would otherwise be needed.
+- **Artifacts**: all - Execution Packet + Context Map + Validation Gates + Stop Conditions + Rollback Notes.
 - **Traceability**: both `implementation-notes.md` and `decisions.md` required.
 
 Pipeline:
@@ -125,7 +148,7 @@ When stopped, report:
 
 - Use `*-check` skills for quick, targeted post-story checklists.
 - Use `agent-validator-*` skills for deeper reviewer-agent passes on risky or broad changes.
-- `quick-story`: minimal workflow for isolated changes — no orchestration, no formal artifacts.
+- `quick-story`: minimal workflow for isolated changes - no orchestration, no formal artifacts.
 - `agent-context-scout`: compact pre-implementation context discovery for broad, ambiguous, cross-module, or high-risk stories. Does not modify files.
 - `architecture-check`: quick architecture checklist after a normal story.
 - `agent-validator-architecture`: deep architecture review for refactors, cross-module changes, new patterns, or architecture-critical work.

@@ -25,8 +25,9 @@ The story should describe product behavior, not an internal engineering checklis
 3. Identify who benefits and how.
 4. Convert requirements into observable behavior.
 5. Add edge cases that affect correctness, security, UX, or data.
-6. Add technical notes that guide architecture without overdesigning.
-7. Mark out-of-scope boundaries explicitly.
+6. Add a lightweight Implementation Context so Codex can find edit points without broad exploration.
+7. Add technical notes that guide architecture without overdesigning.
+8. Mark out-of-scope boundaries explicitly.
 
 ## Template
 
@@ -44,6 +45,20 @@ The story should describe product behavior, not an internal engineering checklis
 ## Context
 
 [Relevant context from project-context, epic, existing code.]
+
+## Implementation Context
+
+Likely files or directories:
+- `[path]` - [why it is probably relevant]
+
+Search anchors:
+- `[symbol|string/route/command]` - [what it should reveal]
+
+Context level:
+- `QUICK / FAST / STANDARD / STRICT / SCOUT`
+
+Avoid unless needed:
+- `[path/glob]` - [why it is probably outside this story]
 
 ## Requirements
 
@@ -86,3 +101,5 @@ The story should describe product behavior, not an internal engineering checklis
 - Include permission expectations when relevant.
 - Include empty states, loading states, and failure states for user-facing work.
 - Include data migration or compatibility notes when existing data is affected.
+- Include `Implementation Context` in every story. Keep it concise: target paths, search anchors, context level, and avoid list.
+- Use `SCOUT` only when edit points are unclear or broad codebase exploration would otherwise be needed.

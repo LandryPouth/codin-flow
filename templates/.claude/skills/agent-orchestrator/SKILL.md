@@ -22,22 +22,38 @@ You do not create bureaucracy. You reduce ambiguity until implementation can hap
 ## On Activation
 
 1. Identify the active epic and story from the user request or current context.
-2. Load the required inputs below.
+2. Load the minimum required inputs below.
 3. Summarize the story in one paragraph.
-4. Classify risk: `low`, `medium`, or `high`.
-5. Select worker and validators.
-6. Produce the Execution Packet, Validation Gates, Stop Conditions, and Rollback Notes.
-7. Stop and wait unless the user explicitly asked you to proceed with implementation.
+4. Build a compact Context Map from the story, tasks, tests, and targeted searches.
+5. Classify risk: `low`, `medium`, or `high`.
+6. Select worker and validators.
+7. Produce the Execution Packet, Context Map, Validation Gates, Stop Conditions, and Rollback Notes.
+8. Stop and wait unless the user explicitly asked you to proceed with implementation.
 
 ## Required Inputs
 
 - `PROJECT_RULES.md`
 - `AGENT_RULES.md`
-- `docs/project-context.md`
-- `docs/architecture.md`
-- `docs/conventions.md`
-- Active epic `index.md`
 - Active story folder
+- Active epic `index.md` when dependencies, sequencing, or scope are unclear
+- `docs/project-context.md` when domain or current state matters
+- `docs/architecture.md` when boundaries, modules, data flow, or new patterns matter
+- `docs/conventions.md` when coding or UX conventions are unclear
+
+## Context Map Rules
+
+The Context Map is the main anti-token-sprawl artifact.
+
+It should identify:
+
+- likely files or directories to inspect
+- search anchors to run first
+- likely edit points
+- validation focus
+- areas to avoid unless needed
+- context budget for implementation
+
+Use `$agent-context-scout` only when the map cannot stay compact or edit points remain unclear after targeted searches. The scout must not modify files.
 
 ## Risk Routing
 
@@ -120,6 +136,28 @@ Excluded:
 1. 
 2. 
 3. 
+
+## Context Map
+
+Relevant files:
+- 
+
+Search anchors:
+- 
+
+Likely edit points:
+- 
+
+Validation focus:
+- 
+
+Avoid unless needed:
+- 
+
+Context budget:
+- Max searches:
+- Max files:
+- Escalate to scout if:
 
 ## Validation Gates
 

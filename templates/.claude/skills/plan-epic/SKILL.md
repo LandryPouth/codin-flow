@@ -27,7 +27,7 @@ This is the macro planning workflow. It keeps the planning path short while stil
 1. Use `$agent-planner` to analyze the request and choose the smallest valuable epic.
 2. Use `$grill-me` only if critical requirements are ambiguous.
 3. Use `$blueprint-epic-index` to create or update the epic `index.md`.
-4. Use `$write-story` to define the story sequence.
+4. Use `$write-story` to define the story sequence with concise Implementation Context for each story.
 5. For each selected story, use:
    - `$blueprint-story`
    - `$blueprint-tasks`
@@ -35,6 +35,20 @@ This is the macro planning workflow. It keeps the planning path short while stil
    - `$blueprint-decisions`
    - `$blueprint-implementation-notes`
 6. Recommend the first story to run.
+
+## Context Efficiency
+
+Planning should make implementation one-shot without forcing the implementation agent to rediscover the whole project.
+
+For each story, include:
+
+- likely files or directories
+- search anchors
+- context level: `QUICK`, `FAST`, `STANDARD`, `STRICT`, or `SCOUT`
+- areas to avoid unless needed
+- validation focus
+
+Use `SCOUT` only for broad, ambiguous, cross-module, or high-risk stories. Do not use it for small isolated stories.
 
 ## Brownfield Additions
 

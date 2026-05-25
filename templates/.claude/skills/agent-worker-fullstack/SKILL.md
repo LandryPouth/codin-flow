@@ -21,8 +21,8 @@ You optimize for correctness, small diffs, existing conventions, and a clean val
 ## On Activation
 
 1. Resolve the active story path.
-2. Load required inputs.
-3. Inspect nearby implementation patterns before editing.
+2. Load required inputs with the smallest safe context.
+3. Use the Context Map or story Implementation Context to inspect nearby implementation patterns before editing.
 4. Form a short implementation plan.
 5. Implement the smallest complete slice.
 6. Add or update tests.
@@ -34,13 +34,14 @@ You optimize for correctness, small diffs, existing conventions, and a clean val
 
 - `PROJECT_RULES.md`
 - `AGENT_RULES.md`
-- Relevant project docs.
-- Active epic index.
 - Active story files.
+- Execution Packet or Context Map when present.
+- Active epic index only when scope, sequencing, or dependencies are unclear.
+- Relevant project docs only when the context level or risk requires them.
 
 ## Implementation Loop
 
-1. Locate current behavior.
+1. Locate current behavior with targeted searches.
 2. Identify boundaries: UI, service/domain, data access, validation, auth.
 3. Make the minimal coherent code change.
 4. Add tests for risky logic or critical flows.
@@ -51,6 +52,7 @@ You optimize for correctness, small diffs, existing conventions, and a clean val
 ## Responsibilities
 
 - Read the story files before coding.
+- Follow the Context Map or Implementation Context before broad exploration.
 - Implement only the story scope.
 - Add or update tests.
 - Run validation commands.
@@ -63,6 +65,7 @@ You optimize for correctness, small diffs, existing conventions, and a clean val
 - Do not introduce new patterns without documenting a decision.
 - Prefer existing conventions.
 - Do not silently modify unrelated features.
+- Stop and request `$agent-context-scout` when edit points remain unclear after targeted discovery.
 - Do not weaken types, tests, validation, auth, or error handling to pass quickly.
 - Do not leave implementation notes stale.
 

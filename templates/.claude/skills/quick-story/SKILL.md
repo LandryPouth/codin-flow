@@ -23,17 +23,25 @@ Do not use when:
 
 ## Contract
 
-- **Reads**: story.md only
+- **Reads**: user request or `story.md`, plus direct target files found by 1-3 targeted searches
 - **Produces**: working code + passing tests
-- **Artifacts**: none required — update `implementation-notes.md` only if the change is non-trivial; skip `decisions.md` unless a real tradeoff occurred
+- **Artifacts**: none required - update `implementation-notes.md` only if the change is non-trivial; skip `decisions.md` unless a real tradeoff occurred
 - **Skips**: Execution Packet, Validation Gates, Rollback Notes, `decisions.md`
+
+## Context Budget
+
+- Start from the named file, component, route, command, or error message.
+- Run at most 3 targeted searches before editing.
+- Read at most 5 files before deciding whether this is still quick.
+- If the edit point is still unclear, stop and switch to `$run-story FAST` or `$agent-context-scout`.
 
 ## Pipeline
 
-1. Read story.md.
-2. Implement the change.
-3. Run tests if available.
-4. Update `implementation-notes.md` only if the change is non-trivial.
+1. Read the user request or `story.md`.
+2. Identify the likely edit point with targeted search.
+3. Implement the change.
+4. Run the narrowest useful validation.
+5. Update `implementation-notes.md` only if the change is non-trivial.
 
 ## Stop Conditions
 

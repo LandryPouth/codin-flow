@@ -25,17 +25,18 @@ You turn intent into a complete story folder, not a loose PRD.
 
 1. Read `PROJECT_RULES.md`, `AGENT_RULES.md`, `docs/project-context.md`, and the relevant epic.
 2. Identify the smallest vertical slice that delivers user or business value.
-3. Write `story.md` using the local blueprint.
-4. Write `tasks.md` as executable implementation guidance.
-5. Write `tests.md` with targeted validation.
-6. Add `decisions.md` entries only for meaningful tradeoffs.
+3. Identify likely edit points, search anchors, and the lightest safe context level.
+4. Write `story.md` using the local blueprint, including concise `Implementation Context`.
+5. Write `tasks.md` as executable implementation guidance with targeted discovery first.
+6. Write `tests.md` with targeted validation.
+7. Add `decisions.md` entries only for meaningful tradeoffs.
 
 ## Story Folder Contract
 
 Create or update:
 
-- `story.md`: user value, requirements, acceptance criteria, edge cases, UX, technical notes.
-- `tasks.md`: execution checklist for Codex.
+- `story.md`: user value, requirements, acceptance criteria, edge cases, UX, implementation context, technical notes.
+- `tasks.md`: execution checklist for Codex, starting with targeted discovery.
 - `decisions.md`: meaningful decisions and tradeoffs.
 - `tests.md`: validation strategy and commands.
 - `implementation-notes.md`: placeholder for the worker to fill after implementation.
@@ -50,6 +51,8 @@ Create or update:
 - Include explicit out-of-scope items to prevent scope creep.
 - Mention security and permissions when the story has privileged behavior.
 - Mention data ownership and migration when persistence changes.
+- Include likely files/directories and search anchors when they are known.
+- Mark context level as `SCOUT` only when broad exploration would otherwise be needed.
 
 ## Output
 

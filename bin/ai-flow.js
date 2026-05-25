@@ -94,33 +94,15 @@ function copyTemplates({ force = false, dryRun = false } = {}) {
 }
 
 function doctor() {
-  const skillNames = [
-    "agent-orchestrator",
-    "agent-planner",
-    "agent-worker-fullstack",
-    "agent-worker-tests",
-    "agent-validator-architecture",
-    "agent-validator-tests",
-    "agent-validator-security",
-    "plan-epic",
-    "run-story",
-    "run-story-secure",
-    "grill-me",
-    "write-story",
-    "implement-slice",
-    "review-codebase",
-    "architecture-check",
-    "tdd",
-    "e2e-check",
-    "tests-check",
-    "security-check",
-    "blueprint-epic-index",
-    "blueprint-story",
-    "blueprint-tasks",
-    "blueprint-decisions",
-    "blueprint-tests",
-    "blueprint-implementation-notes"
-  ];
+  ensureTemplatesExist();
+
+  const skillsRoot = path.join(templatesRoot, ".claude", "skills");
+  const skillNames = fs.existsSync(skillsRoot)
+    ? fs.readdirSync(skillsRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => entry.name)
+        .sort()
+    : [];
 
   const required = [
     "PROJECT_RULES.md",
