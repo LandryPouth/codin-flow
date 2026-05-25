@@ -40,7 +40,8 @@ Use the lightest context level that protects the story.
 - `FAST`: story folder, targeted files, inline stop conditions and rollback notes, no orchestrator unless scope expands.
 - `STANDARD`: story folder, epic index as needed, compact Execution Packet, targeted Context Map, normal validation.
 - `STRICT`: required project docs, compact Context Map, security/architecture/test gates, deeper validators when risk justifies them.
-- `SCOUT`: use `$agent-context-scout` only when edit points are unclear, the story crosses modules, or broad reading would otherwise be needed.
+
+`SCOUT` is not an execution mode. Use `$agent-context-scout` as a pre-step when edit points are unclear, the story crosses modules, or broad reading would otherwise be needed.
 
 Context budget defaults:
 
@@ -54,6 +55,7 @@ If a context budget is exceeded, stop and summarize what is known before reading
 ## Composite Workflows
 
 - Use `plan-epic` to create an epic and its implementation-ready stories from product intent or brownfield analysis.
+- Use `bootstrap-brownfield` after `ai-flow bootstrap --scan` to turn a local scan into durable project docs.
 - Use `quick-story` for small, isolated changes that need no orchestration or formal artifacts.
 - Use `run-story` for story execution in `FAST`, `STANDARD`, or `STRICT` mode.
 - Use `run-story-secure` for security-sensitive stories: normal execution plus security validation.
@@ -148,6 +150,7 @@ When stopped, report:
 
 - Use `*-check` skills for quick, targeted post-story checklists.
 - Use `agent-validator-*` skills for deeper reviewer-agent passes on risky or broad changes.
+- `bootstrap-brownfield`: convert `docs/bootstrap-scan.md` into useful project context without modifying application code.
 - `quick-story`: minimal workflow for isolated changes - no orchestration, no formal artifacts.
 - `agent-context-scout`: compact pre-implementation context discovery for broad, ambiguous, cross-module, or high-risk stories. Does not modify files.
 - `architecture-check`: quick architecture checklist after a normal story.

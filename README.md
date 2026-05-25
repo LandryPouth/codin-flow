@@ -26,6 +26,7 @@ Il installe dans votre projet :
 - [Guides pratiques](#guides-pratiques)
 - [Fichiers de contexte](#fichiers-de-contexte)
 - [Stop conditions](#stop-conditions)
+- [Commandes CLI](#commandes-cli)
 - [Développement local du package](#développement-local-du-package)
 
 ## Installation Rapide
@@ -42,11 +43,45 @@ Vérifiez ensuite l'installation :
 npx ai-native-coding-flow doctor
 ```
 
+Si `doctor` signale des fichiers manquants ou un miroir `.agents` désynchronisé :
+
+```bash
+npx ai-native-coding-flow doctor --fix
+```
+
+Pour inspecter les skills disponibles :
+
+```bash
+npx ai-native-coding-flow list-skills
+```
+
+Pour mettre à jour un projet déjà initialisé sans écraser les modifications locales :
+
+```bash
+npx ai-native-coding-flow upgrade --dry-run
+npx ai-native-coding-flow upgrade
+```
+
+Pour voir l'état des epics et stories :
+
+```bash
+npx ai-native-coding-flow status
+```
+
+Pour préparer un projet existant :
+
+```bash
+npx ai-native-coding-flow bootstrap --scan
+```
+
 Si le package est installé globalement ou lié localement :
 
 ```bash
 ai-flow init
 ai-flow doctor
+ai-flow upgrade
+ai-flow status
+ai-flow list-skills
 ```
 
 Par défaut, les fichiers existants ne sont pas écrasés. Pour réinstaller volontairement les templates :
@@ -61,6 +96,14 @@ Pour voir ce qui serait installé sans écrire de fichiers :
 ai-flow init --dry-run
 ```
 
+Pour une sortie lisible par CI ou scripts :
+
+```bash
+ai-flow doctor --json
+ai-flow status --json
+ai-flow list-skills --json
+```
+
 ## Démarrage En 10 Minutes
 
 ### Projet Existant
@@ -69,6 +112,16 @@ Demandez d'abord à l'agent d'analyser le projet sans modifier l'application :
 
 ```txt
 Use $agent-planner to analyze this existing codebase and update docs/project-context.md, docs/architecture.md, docs/conventions.md, docs/roadmap.md, PROJECT_RULES.md, and AGENT_RULES.md. Do not modify application code.
+```
+
+Option plus économique en contexte pour les codebases existants :
+
+```bash
+ai-flow bootstrap --scan
+```
+
+```txt
+Use $bootstrap-brownfield with docs/bootstrap-scan.md to fill project context, architecture, conventions, and roadmap. Do not modify application code.
 ```
 
 Puis créez le premier epic :
@@ -250,13 +303,20 @@ Use $agent-validator-security to review the permission and data visibility model
 
 Coding Flow utilise une échelle de contexte.
 
-| Niveau | À utiliser quand | Contexte attendu |
+| Mode | À utiliser quand | Contexte attendu |
 | --- | --- | --- |
 | `QUICK` | Changement minuscule et évident | Requête, `story.md` si présent, 1-3 recherches, fichiers ciblés. |
 | `FAST` | Story simple et faible risque | Story folder, fichiers ciblés, stop conditions inline. |
 | `STANDARD` | Feature normale | Execution Packet compact, Context Map, validation normale. |
 | `STRICT` | Changement risqué | Docs nécessaires, Context Map, tests, architecture, sécurité. |
-| `SCOUT` | Point d'édition flou | Cartographie courte par `$agent-context-scout`, sans modification de fichiers. |
+
+`SCOUT` n'est pas un mode d'exécution. C'est une pré-étape optionnelle :
+
+```txt
+edit points unclear -> agent-context-scout -> FAST/STANDARD/STRICT
+```
+
+Utilisez `$agent-context-scout` quand le point d'édition est flou, cross-module, ou quand l'agent risquerait de lire trop large.
 
 Budgets par défaut :
 
@@ -293,6 +353,7 @@ Important :
     blueprint-decisions/
     blueprint-implementation-notes/
 
+    bootstrap-brownfield/
     plan-epic/
     quick-story/
     run-story/
@@ -309,8 +370,12 @@ Important :
     write-story/
 
 .agents/
+  README.md
   skills/
     same skills mirrored for Codex and other agents
+
+.coding-flow/
+  manifest.json
 
 docs/
   project-context.md
@@ -320,6 +385,10 @@ docs/
 
 epics/
 
+examples/
+  epic-01-example-admin-content/
+
+AGENTS.md
 AGENT_RULES.md
 PROJECT_RULES.md
 CLAUDE.md
@@ -328,6 +397,10 @@ CLAUDE.md
 Claude Code découvre les skills dans `.claude/skills/`.
 
 Coding Flow installe aussi les mêmes skills dans `.agents/skills/` pour Codex et les agents qui ne lisent pas automatiquement le dossier Claude.
+
+Le miroir est volontairement physique plutôt qu'un symlink pour rester compatible avec Windows, npm, archives zip, CI et agents qui ne suivent pas toujours les liens symboliques. `ai-flow doctor` vérifie que le miroir reste conforme, et `ai-flow doctor --fix` peut le resynchroniser.
+
+`.coding-flow/manifest.json` permet à `ai-flow upgrade` de mettre à jour les fichiers installés sans écraser les modifications locales.
 
 `CLAUDE.md` importe les règles projet :
 
@@ -353,6 +426,7 @@ Coding Flow installe aussi les mêmes skills dans `.agents/skills/` pour Codex e
 | --- | --- |
 | `$grill-me` | Clarifier un besoin flou avec des questions ciblées. |
 | `$agent-planner` | Transformer une intention produit en plan, epic ou stories. |
+| `$bootstrap-brownfield` | Transformer `docs/bootstrap-scan.md` en docs projet utiles. |
 | `$write-story` | Créer ou raffiner une story verticale. |
 | `$blueprint-epic-index` | Générer `index.md` pour un epic. |
 | `$blueprint-story` | Générer `story.md`. |
@@ -422,9 +496,31 @@ Use $run-story in STANDARD mode for story-02-03 using the Context Map.
 
 ### Préparer Un Projet Brownfield
 
+```bash
+ai-flow bootstrap --scan
+```
+
+```txt
+Use $bootstrap-brownfield with docs/bootstrap-scan.md to fill project context, architecture, conventions, and roadmap. Do not modify application code.
+```
+
+Alternative agent-only :
+
 ```txt
 Use $agent-planner to analyze this codebase, identify the stack, architecture, hardcoded data, coupling points, conventions, risks, and recommended first epic. Update only workflow docs. Do not change application code.
 ```
+
+### Voir L'État Des Stories
+
+```bash
+ai-flow status
+```
+
+```bash
+ai-flow status --json
+```
+
+Le statut est lu depuis `implementation-notes.md` quand une section `## Status` existe. Sinon, le CLI l'infère depuis les notes.
 
 ## Fichiers De Contexte
 
@@ -535,15 +631,37 @@ Quand une stop condition se déclenche, l'agent doit expliquer :
 - Évitez les stories techniques pures si elles ne livrent pas un comportement observable.
 - Préférez une Context Map compacte à une exploration brute du repository.
 
+## Commandes CLI
+
+| Commande | Usage |
+| --- | --- |
+| `ai-flow init` | Installer les templates dans un projet. |
+| `ai-flow upgrade` | Mettre à jour les fichiers installés sans écraser les modifications locales. |
+| `ai-flow doctor` | Vérifier les fichiers, skills, frontmatter, manifest et miroir `.agents`. |
+| `ai-flow doctor --fix` | Restaurer les fichiers manquants et resynchroniser `.agents/skills`. |
+| `ai-flow doctor --strict` | Ajouter des checks plus stricts sur manifest et docs. |
+| `ai-flow status` | Lister les epics/stories et leur statut inféré. |
+| `ai-flow bootstrap --scan` | Scanner un codebase existant et écrire `docs/bootstrap-scan.md`. |
+| `ai-flow list-skills` | Afficher les skills disponibles. |
+
+Commandes utiles en CI :
+
+```bash
+ai-flow doctor --json
+ai-flow status --json
+ai-flow list-skills --json
+```
+
 ## Développement Local Du Package
 
 Depuis ce repository :
 
 ```bash
 node bin/ai-flow.js init --dry-run
-node bin/ai-flow.js init
-node bin/ai-flow.js doctor
+node bin/ai-flow.js list-skills
 ```
+
+`doctor` vérifie une installation dans un projet cible. Pour tester `doctor`, utilisez plutôt un dossier temporaire.
 
 Tester l'installation dans un dossier temporaire :
 
@@ -552,6 +670,9 @@ mkdir /tmp/coding-flow-test
 cd /tmp/coding-flow-test
 node /path/to/coding-flow/bin/ai-flow.js init --force
 node /path/to/coding-flow/bin/ai-flow.js doctor
+node /path/to/coding-flow/bin/ai-flow.js doctor --json
+node /path/to/coding-flow/bin/ai-flow.js status
+node /path/to/coding-flow/bin/ai-flow.js bootstrap --scan
 ```
 
 Tester comme commande globale :
@@ -560,6 +681,11 @@ Tester comme commande globale :
 npm link
 ai-flow init --dry-run
 ai-flow doctor
+ai-flow doctor --fix
+ai-flow upgrade --dry-run
+ai-flow status
+ai-flow bootstrap --scan
+ai-flow list-skills
 ```
 
 ## Publication npm
@@ -587,4 +713,5 @@ Utilisez `--access public` lors de la première publication d'un package scoped 
 - `ai-flow add-epic`
 - `ai-flow add-story`
 - meilleure fusion avec des docs existantes
-- `ai-flow doctor --fix`
+- checks doctor plus stricts pour les références croisées entre skills
+- support optionnel d'un format status plus strict dans les story files

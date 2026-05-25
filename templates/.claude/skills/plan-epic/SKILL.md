@@ -44,11 +44,12 @@ For each story, include:
 
 - likely files or directories
 - search anchors
-- context level: `QUICK`, `FAST`, `STANDARD`, `STRICT`, or `SCOUT`
+- execution mode: `QUICK`, `FAST`, `STANDARD`, or `STRICT`
+- scout pre-step: `yes/no`
 - areas to avoid unless needed
 - validation focus
 
-Use `SCOUT` only for broad, ambiguous, cross-module, or high-risk stories. Do not use it for small isolated stories.
+Use `$agent-context-scout` only for broad, ambiguous, cross-module, or high-risk stories. Do not use it for small isolated stories.
 
 ## Brownfield Additions
 

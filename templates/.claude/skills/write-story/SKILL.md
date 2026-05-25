@@ -52,7 +52,7 @@ Create or update:
 - Mention security and permissions when the story has privileged behavior.
 - Mention data ownership and migration when persistence changes.
 - Include likely files/directories and search anchors when they are known.
-- Mark context level as `SCOUT` only when broad exploration would otherwise be needed.
+- Mark `Scout pre-step` as `yes` only when broad exploration would otherwise be needed.
 
 ## Output
 

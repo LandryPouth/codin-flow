@@ -54,8 +54,11 @@ Likely files or directories:
 Search anchors:
 - `[symbol|string/route/command]` - [what it should reveal]
 
-Context level:
-- `QUICK / FAST / STANDARD / STRICT / SCOUT`
+Execution mode:
+- `QUICK / FAST / STANDARD / STRICT`
+
+Scout pre-step:
+- `yes/no` - [yes only when edit points are unclear or broad discovery would otherwise be needed]
 
 Avoid unless needed:
 - `[path/glob]` - [why it is probably outside this story]
@@ -101,5 +104,5 @@ Avoid unless needed:
 - Include permission expectations when relevant.
 - Include empty states, loading states, and failure states for user-facing work.
 - Include data migration or compatibility notes when existing data is affected.
-- Include `Implementation Context` in every story. Keep it concise: target paths, search anchors, context level, and avoid list.
-- Use `SCOUT` only when edit points are unclear or broad codebase exploration would otherwise be needed.
+- Include `Implementation Context` in every story. Keep it concise: target paths, search anchors, execution mode, scout pre-step, and avoid list.
+- Mark `Scout pre-step` as `yes` only when edit points are unclear or broad codebase exploration would otherwise be needed.
