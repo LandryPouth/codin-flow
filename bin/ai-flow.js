@@ -26,6 +26,7 @@ const flowScripts = {
   "flow:check": `${githubNpxCommand} doctor --strict`,
   "flow:harness": `${githubNpxCommand} harness check --quick`,
   "flow:commands": `${githubNpxCommand} commands`,
+  "flow:uninstall": `${githubNpxCommand} uninstall`,
 };
 
 function getFlagValue(name, fallback = null) {
@@ -250,6 +251,7 @@ function readManifest() {
     version: null,
     installedAt: null,
     updatedAt: null,
+    packageJsonCreated: false,
     files: {},
   });
 }
@@ -277,12 +279,20 @@ function buildManifestFromCurrentTargets(previous = null) {
     version: packageJson.version,
     installedAt: previous && previous.installedAt ? previous.installedAt : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    packageJsonCreated: Boolean(previous && previous.packageJsonCreated),
     files,
   };
 }
 
 function writeManifest(previous = null) {
   writeJson(manifestPath(), buildManifestFromCurrentTargets(previous));
+}
+
+function markGeneratedPackageJson() {
+  const manifest = readManifest();
+  manifest.packageJsonCreated = true;
+  manifest.updatedAt = new Date().toISOString();
+  writeJson(manifestPath(), manifest);
 }
 
 function detectProjectPackageJson() {
@@ -410,6 +420,21 @@ function buildCommandsMarkdown({ hasPackageJson = false } = {}) {
         `${githubNpxCommand} status`,
         `${githubNpxCommand} harness check --quick`,
       ];
+  const setupCommands = hasPackageJson
+    ? [
+        `${githubNpxCommand} init`,
+        "npm run flow:upgrade",
+        "npm run flow:fix",
+        "npm run flow:uninstall -- --dry-run",
+        "npm run flow:uninstall",
+      ]
+    : [
+        `${githubNpxCommand} init`,
+        `${githubNpxCommand} upgrade`,
+        `${githubNpxCommand} doctor --fix`,
+        `${githubNpxCommand} uninstall --dry-run`,
+        `${githubNpxCommand} uninstall`,
+      ];
 
   return [
     "# Coding Flow Commands",
@@ -425,11 +450,7 @@ function buildCommandsMarkdown({ hasPackageJson = false } = {}) {
     "## Setup And Updates",
     "",
     "```bash",
-    `${githubNpxCommand} init`,
-    `${githubNpxCommand} upgrade`,
-    `${githubNpxCommand} doctor --fix`,
-    `${githubNpxCommand} uninstall --dry-run`,
-    `${githubNpxCommand} uninstall`,
+    ...setupCommands,
     "```",
     "",
     "## Direct GitHub Commands",
@@ -476,16 +497,13 @@ function ensurePackageScripts({ dryRun = false } = {}) {
   const detected = detectProjectPackageJson();
   const result = {
     packageJsonExists: detected.exists,
+    packageJsonCreated: !detected.exists,
     added: [],
     existing: [],
     conflicts: [],
   };
 
-  if (!detected.exists) {
-    return result;
-  }
-
-  if (!detected.packageJson || typeof detected.packageJson !== "object") {
+  if (detected.exists && (!detected.packageJson || typeof detected.packageJson !== "object")) {
     result.conflicts.push({
       script: null,
       current: null,
@@ -495,7 +513,7 @@ function ensurePackageScripts({ dryRun = false } = {}) {
     return result;
   }
 
-  const packageJson = detected.packageJson;
+  const packageJson = detected.exists ? detected.packageJson : { private: true };
   const scripts = packageJson.scripts && typeof packageJson.scripts === "object"
     ? packageJson.scripts
     : {};
@@ -519,15 +537,20 @@ function ensurePackageScripts({ dryRun = false } = {}) {
   if (result.added.length > 0 && !dryRun) {
     packageJson.scripts = scripts;
     writeJson(detected.path, packageJson);
+
+    if (result.packageJsonCreated) {
+      markGeneratedPackageJson();
+    }
   }
 
   return result;
 }
 
-function removePackageScripts({ dryRun = false } = {}) {
+function removePackageScripts({ dryRun = false, removeGeneratedPackageJson = false } = {}) {
   const detected = detectProjectPackageJson();
   const result = {
     packageJsonExists: detected.exists,
+    packageJsonRemoved: false,
     removed: [],
     skipped: [],
     conflicts: [],
@@ -563,17 +586,34 @@ function removePackageScripts({ dryRun = false } = {}) {
     }
   }
 
-  if (result.removed.length > 0 && !dryRun) {
-    if (Object.keys(scripts).length > 0) {
-      packageJson.scripts = scripts;
-    } else {
-      delete packageJson.scripts;
-    }
+  if (Object.keys(scripts).length > 0) {
+    packageJson.scripts = scripts;
+  } else {
+    delete packageJson.scripts;
+  }
 
+  const shouldRemovePackageJson = removeGeneratedPackageJson && isGeneratedPackageJsonRemovable(packageJson);
+
+  if (shouldRemovePackageJson) {
+    result.packageJsonRemoved = true;
+
+    if (!dryRun) {
+      fs.unlinkSync(detected.path);
+    }
+  } else if (result.removed.length > 0 && !dryRun) {
     writeJson(detected.path, packageJson);
   }
 
   return result;
+}
+
+function isGeneratedPackageJsonRemovable(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const keys = Object.keys(value);
+  return keys.length === 1 && value.private === true;
 }
 
 function ensureConvenienceFiles({ dryRun = false, force = false } = {}) {
@@ -581,7 +621,7 @@ function ensureConvenienceFiles({ dryRun = false, force = false } = {}) {
   const commandsFile = ensureCommandsFile({
     dryRun,
     force,
-    hasPackageJson: scripts.packageJsonExists,
+    hasPackageJson: scripts.packageJsonExists || scripts.packageJsonCreated,
   });
 
   return {
@@ -591,7 +631,11 @@ function ensureConvenienceFiles({ dryRun = false, force = false } = {}) {
 }
 
 function printConvenienceSummary(convenience, { dryRun = false } = {}) {
-  if (convenience.scripts.packageJsonExists) {
+  if (convenience.scripts.packageJsonCreated) {
+    log(`Package.json: ${dryRun ? "would create" : "created"} at project root`);
+  }
+
+  if (convenience.scripts.packageJsonExists || convenience.scripts.packageJsonCreated) {
     if (convenience.scripts.added.length > 0) {
       log(`Package scripts: ${dryRun ? "would add" : "added"} ${convenience.scripts.added.join(", ")}`);
     } else {
@@ -608,8 +652,6 @@ function printConvenienceSummary(convenience, { dryRun = false } = {}) {
         }
       }
     }
-  } else {
-    log("Package scripts: skipped (no package.json in target project)");
   }
 
   if (convenience.commandsFile === "created") {
@@ -678,6 +720,7 @@ function collectUninstallPlan({ force = false } = {}) {
 
   return {
     manifestExists: Boolean(manifest),
+    packageJsonCreated: Boolean(manifest && manifest.packageJsonCreated),
     files: [...new Set(files)].sort((a, b) => b.localeCompare(a)),
     skippedModified,
     skippedUnsafe,
@@ -730,11 +773,12 @@ function uninstall({ dryRun = false, force = false, json = false } = {}) {
   const scripts = blocked
     ? {
         packageJsonExists: detectProjectPackageJson().exists,
+        packageJsonRemoved: false,
         removed: [],
         skipped: [],
         conflicts: [],
       }
-    : removePackageScripts({ dryRun });
+    : removePackageScripts({ dryRun, removeGeneratedPackageJson: plan.packageJsonCreated });
   const result = {
     ok: !blocked && scripts.conflicts.length === 0,
     dryRun,
@@ -743,6 +787,7 @@ function uninstall({ dryRun = false, force = false, json = false } = {}) {
     removedDirs: [...new Set(removedDirs)].sort(),
     skippedModified: plan.skippedModified,
     skippedUnsafe: plan.skippedUnsafe,
+    packageJsonRemoved: scripts.packageJsonRemoved,
     removedScripts: scripts.removed,
     skippedScripts: scripts.skipped,
     scriptConflicts: scripts.conflicts,
@@ -762,6 +807,9 @@ function uninstall({ dryRun = false, force = false, json = false } = {}) {
 
     log(`Removed files: ${result.removedFiles.length}`);
     log(`Removed package scripts: ${result.removedScripts.length}`);
+    if (result.packageJsonRemoved) {
+      log(dryRun ? "Would remove generated package.json." : "Removed generated package.json.");
+    }
     log("Preserved: epics/");
 
     if (result.skippedModified.length > 0) {
@@ -2176,9 +2224,9 @@ function printCommands({ json = false } = {}) {
         },
     setup: {
       init: `${githubNpxCommand} init`,
-      upgrade: `${githubNpxCommand} upgrade`,
-      fix: `${githubNpxCommand} doctor --fix`,
-      uninstall: `${githubNpxCommand} uninstall`,
+      upgrade: detected.exists ? "npm run flow:upgrade" : `${githubNpxCommand} upgrade`,
+      fix: detected.exists ? "npm run flow:fix" : `${githubNpxCommand} doctor --fix`,
+      uninstall: detected.exists ? "npm run flow:uninstall" : `${githubNpxCommand} uninstall`,
     },
     cheatsheet: normalizePortable(path.relative(cwd, commandsPath())),
   };

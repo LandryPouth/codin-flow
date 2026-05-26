@@ -87,7 +87,9 @@ Dans le projet que vous voulez équiper :
 npx github:LandryPouth/codin-flow init
 ```
 
-Si le projet contient un `package.json`, `init` ajoute aussi des scripts locaux `flow:*`. Le quotidien devient alors :
+`init` ajoute aussi des scripts locaux `flow:*` dans le `package.json`.
+Si le projet n'a pas encore de `package.json`, Coding Flow en crée un minimal à la racine avec `private: true`.
+Le quotidien devient alors :
 
 ```bash
 npm run flow:doctor
@@ -102,24 +104,10 @@ npm run flow:check
 .coding-flow/COMMANDS.md
 ```
 
-Si le projet n'a pas de `package.json`, utilisez les commandes GitHub directes :
-
-```bash
-npx github:LandryPouth/codin-flow doctor
-npx github:LandryPouth/codin-flow list-skills
-npx github:LandryPouth/codin-flow status
-```
-
 Pour afficher les commandes utiles depuis le projet :
 
 ```bash
 npm run flow:commands
-```
-
-Ou, sans scripts locaux :
-
-```bash
-npx github:LandryPouth/codin-flow commands
 ```
 
 Si `doctor` signale des fichiers manquants ou un miroir `.agents` désynchronisé :
@@ -730,7 +718,8 @@ Quand une stop condition se déclenche, l'agent doit expliquer :
 | `ai-flow uninstall` | Retirer Coding Flow du projet en conservant `epics/`. |
 | `ai-flow list-skills` | Afficher les skills disponibles. |
 
-Après `init`, les projets avec `package.json` ont aussi des scripts plus faciles à retenir :
+Après `init`, le projet a des scripts plus faciles à retenir.
+Si aucun `package.json` n'existait, Coding Flow en crée un minimal à la racine :
 
 | Script local | Usage |
 | --- | --- |
@@ -740,6 +729,7 @@ Après `init`, les projets avec `package.json` ont aussi des scripts plus facile
 | `npm run flow:status` | Lister les epics/stories. |
 | `npm run flow:harness` | Lancer le check harness rapide. |
 | `npm run flow:commands` | Afficher le pense-bête des commandes. |
+| `npm run flow:uninstall` | Retirer Coding Flow du projet. |
 
 Commandes utiles en CI :
 
@@ -763,6 +753,7 @@ La commande supprime :
 - les fichiers installés par Coding Flow (`AGENT_RULES.md`, `PROJECT_RULES.md`, `CLAUDE.md`, `docs/`, `.claude/skills/`, `.agents/skills/`, etc.) ;
 - `.coding-flow/manifest.json`, `.coding-flow/harness.json`, `.coding-flow/COMMANDS.md` et les preuves harness dans `.coding-flow/runs/` ;
 - les scripts `flow:*` ajoutés au `package.json` quand ils correspondent aux commandes générées par Coding Flow.
+- le `package.json` minimal créé par Coding Flow, uniquement s'il n'a pas été enrichi par le projet.
 
 La commande conserve toujours :
 
@@ -876,7 +867,9 @@ npx github:LandryPouth/codin-flow doctor
 
 Chaque appel `npx github:LandryPouth/codin-flow ...` récupère le package depuis GitHub et exécute le binaire déclaré dans `package.json`.
 
-Après `init`, un projet avec `package.json` peut utiliser les scripts locaux `npm run flow:*`, donc l'utilisateur n'a plus besoin de mémoriser la commande GitHub complète pour les actions courantes.
+Après `init`, le projet peut utiliser les scripts locaux `npm run flow:*`.
+Si le projet n'avait pas de `package.json`, Coding Flow en crée un minimal pour garder les commandes simples.
+L'utilisateur n'a donc plus besoin de mémoriser la commande GitHub complète pour les actions courantes.
 
 Pour travailler sur le package lui-même, clonez le repo et liez la commande localement :
 
