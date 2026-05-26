@@ -74,92 +74,92 @@ Le point important : l'utilisateur ne doit pas enchaîner dix commandes à la ma
 - [Stop conditions](#stop-conditions)
 - [Commandes CLI](#commandes-cli)
 - [Développement local du package](#développement-local-du-package)
-- [Distribution GitHub](#distribution-github)
+- [Distribution GitHub via npx](#distribution-github-via-npx)
 
 ## Installation Rapide
 
-Coding Flow est distribué depuis GitHub. Il n'est pas nécessaire de le publier sur npm.
+Coding Flow est distribué depuis GitHub. Il n'est pas nécessaire de cloner le repository ni de publier le package sur npm pour l'utiliser.
 
-Installation globale depuis le repo GitHub :
-
-```bash
-gh repo clone LandryPouth/codin-flow
-cd codin-flow
-npm install
-npm link
-```
-
-Puis, dans le projet que vous voulez équiper :
+Dans le projet que vous voulez équiper :
 
 ```bash
-cd /chemin/vers/votre-projet
-ai-flow init
+npx github:LandryPouth/codin-flow init
 ```
 
 Vérifiez ensuite l'installation dans ce projet cible :
 
 ```bash
-ai-flow doctor
+npx github:LandryPouth/codin-flow doctor
 ```
 
 Si `doctor` signale des fichiers manquants ou un miroir `.agents` désynchronisé :
 
 ```bash
-ai-flow doctor --fix
+npx github:LandryPouth/codin-flow doctor --fix
 ```
 
 Pour inspecter les skills disponibles :
 
 ```bash
-ai-flow list-skills
+npx github:LandryPouth/codin-flow list-skills
 ```
 
 Pour mettre à jour un projet déjà initialisé sans écraser les modifications locales :
 
 ```bash
-ai-flow upgrade --dry-run
-ai-flow upgrade
+npx github:LandryPouth/codin-flow upgrade --dry-run
+npx github:LandryPouth/codin-flow upgrade
 ```
 
 Pour voir l'état des epics et stories :
 
 ```bash
-ai-flow status
+npx github:LandryPouth/codin-flow status
 ```
 
 Pour préparer un projet existant :
 
 ```bash
-ai-flow bootstrap --scan
+npx github:LandryPouth/codin-flow bootstrap --scan
 ```
 
-Pour mettre à jour l'outil lui-même depuis GitHub :
+Si vous préférez une commande courte pendant une session de travail, vous pouvez aussi lancer le CLI avec `npm exec` :
 
 ```bash
-cd /chemin/vers/codin-flow
-git pull
-npm install
-npm link
+npm exec github:LandryPouth/codin-flow -- doctor
+npm exec github:LandryPouth/codin-flow -- list-skills
+```
+
+Pour le développement local du package, clonez le repo puis utilisez `npm link` ; voir [Développement local du package](#développement-local-du-package).
+
+Si le package est lié localement avec `npm link`, les commandes courtes deviennent disponibles :
+
+```bash
+ai-flow init
+ai-flow doctor
+ai-flow upgrade
+ai-flow status
+ai-flow list-skills
 ```
 
 Par défaut, les fichiers existants ne sont pas écrasés. Pour réinstaller volontairement les templates :
 
 ```bash
-ai-flow init --force
+npx github:LandryPouth/codin-flow init --force
 ```
 
 Pour voir ce qui serait installé sans écrire de fichiers :
 
 ```bash
-ai-flow init --dry-run
+npx github:LandryPouth/codin-flow init --dry-run
 ```
 
 Pour une sortie lisible par CI ou scripts :
 
 ```bash
-ai-flow doctor --json
-ai-flow status --json
-ai-flow list-skills --json
+npx github:LandryPouth/codin-flow doctor --json
+npx github:LandryPouth/codin-flow status --json
+npx github:LandryPouth/codin-flow list-skills --json
 ```
 
 ## Démarrage En 10 Minutes
@@ -803,9 +803,18 @@ ai-flow bootstrap --scan
 ai-flow list-skills
 ```
 
-## Distribution GitHub
+## Distribution GitHub Via `npx`
 
-La distribution officielle passe par GitHub :
+La distribution officielle passe par GitHub via `npx`. L'utilisateur final n'a pas besoin de cloner ce repository :
+
+```bash
+npx github:LandryPouth/codin-flow init
+npx github:LandryPouth/codin-flow doctor
+```
+
+Chaque appel `npx github:LandryPouth/codin-flow ...` récupère le package depuis GitHub et exécute le binaire déclaré dans `package.json`.
+
+Pour travailler sur le package lui-même, clonez le repo et liez la commande localement :
 
 ```bash
 gh repo clone LandryPouth/codin-flow
@@ -814,16 +823,15 @@ npm install
 npm link
 ```
 
-Pour mettre à jour l'installation locale :
+Pour mettre à jour cette installation locale de développement :
 
 ```bash
-cd /chemin/vers/codin-flow
 git pull
 npm install
 npm link
 ```
 
-`npm pack --dry-run` reste utile pour vérifier ce qui serait embarqué dans une archive, mais le projet n'a pas besoin d'être publié sur npm pour être utilisé.
+`npm pack --dry-run` reste utile pour vérifier ce qui serait embarqué dans une archive, mais le projet n'a pas besoin d'être publié sur npm pour être utilisé par les utilisateurs.
 
 ## Roadmap
 
