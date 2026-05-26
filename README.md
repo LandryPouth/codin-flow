@@ -73,6 +73,7 @@ Le point important : l'utilisateur ne doit pas enchaîner dix commandes à la ma
 - [Fichiers de contexte](#fichiers-de-contexte)
 - [Stop conditions](#stop-conditions)
 - [Commandes CLI](#commandes-cli)
+- [Désinstaller Coding Flow](#désinstaller-coding-flow)
 - [Développement local du package](#développement-local-du-package)
 - [Distribution GitHub via npx](#distribution-github-via-npx)
 
@@ -726,6 +727,7 @@ Quand une stop condition se déclenche, l'agent doit expliquer :
 | `ai-flow harness check --story <path>` | Vérifier secrets, fichiers sensibles et preuves minimales de story. |
 | `ai-flow harness evidence --story <path>` | Écrire une preuve légère dans `.coding-flow/runs/`. |
 | `ai-flow commands` | Afficher les commandes les plus utiles pour le projet courant. |
+| `ai-flow uninstall` | Retirer Coding Flow du projet en conservant `epics/`. |
 | `ai-flow list-skills` | Afficher les skills disponibles. |
 
 Après `init`, les projets avec `package.json` ont aussi des scripts plus faciles à retenir :
@@ -746,6 +748,38 @@ npm run flow:doctor -- --json
 npm run flow:harness -- --json
 npm run flow:status -- --json
 npm run flow:skills -- --json
+```
+
+## Désinstaller Coding Flow
+
+Pour retirer Coding Flow d'un projet sans supprimer les epics et stories déjà créés :
+
+```bash
+npx github:LandryPouth/codin-flow uninstall
+```
+
+La commande supprime :
+
+- les fichiers installés par Coding Flow (`AGENT_RULES.md`, `PROJECT_RULES.md`, `CLAUDE.md`, `docs/`, `.claude/skills/`, `.agents/skills/`, etc.) ;
+- `.coding-flow/manifest.json`, `.coding-flow/harness.json`, `.coding-flow/COMMANDS.md` et les preuves harness dans `.coding-flow/runs/` ;
+- les scripts `flow:*` ajoutés au `package.json` quand ils correspondent aux commandes générées par Coding Flow.
+
+La commande conserve toujours :
+
+- `epics/` ;
+- toutes les stories, tâches, décisions et notes générées dans les epics ;
+- les scripts `flow:*` qui ont été modifiés manuellement.
+
+Pour prévisualiser avant suppression :
+
+```bash
+npx github:LandryPouth/codin-flow uninstall --dry-run
+```
+
+Si certains fichiers Coding Flow ont été modifiés localement, ils sont conservés par défaut. Pour forcer leur suppression :
+
+```bash
+npx github:LandryPouth/codin-flow uninstall --force
 ```
 
 ## Harness De Sécurité

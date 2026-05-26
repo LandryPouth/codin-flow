@@ -136,7 +136,7 @@ function readJson(filePath, fallback = null) {
   }
 
   try {
-    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return JSON.parse(fs.readFileSync(filePath, "utf8").replace(/^\uFEFF/, ""));
   } catch {
     return fallback;
   }
@@ -146,6 +146,52 @@ function writeJson(filePath, value) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(`${filePath}.tmp`, `${JSON.stringify(value, null, 2)}\n`);
   fs.renameSync(`${filePath}.tmp`, filePath);
+}
+
+function removeFileIfExists(filePath, { dryRun = false } = {}) {
+  if (!fs.existsSync(filePath)) {
+    return false;
+  }
+
+  if (!dryRun) {
+    fs.unlinkSync(filePath);
+  }
+
+  return true;
+}
+
+function removeEmptyDirsUpward(startDir, stopDir, { dryRun = false } = {}) {
+  const removed = [];
+  let current = startDir;
+  const resolvedStop = path.resolve(stopDir);
+
+  while (isPathInside(path.resolve(current), resolvedStop) && path.resolve(current) !== resolvedStop) {
+    if (!fs.existsSync(current)) {
+      current = path.dirname(current);
+      continue;
+    }
+
+    const entries = fs.readdirSync(current);
+
+    if (entries.length > 0) {
+      break;
+    }
+
+    removed.push(normalizePortable(path.relative(cwd, current)));
+
+    if (!dryRun) {
+      fs.rmdirSync(current);
+    }
+
+    current = path.dirname(current);
+  }
+
+  return removed;
+}
+
+function isPathInside(candidate, root) {
+  const relative = path.relative(path.resolve(root), path.resolve(candidate));
+  return relative === "" || Boolean(relative) && !relative.startsWith("..") && !path.isAbsolute(relative);
 }
 
 function listTemplateSkillNames() {
@@ -382,6 +428,8 @@ function buildCommandsMarkdown({ hasPackageJson = false } = {}) {
     `${githubNpxCommand} init`,
     `${githubNpxCommand} upgrade`,
     `${githubNpxCommand} doctor --fix`,
+    `${githubNpxCommand} uninstall --dry-run`,
+    `${githubNpxCommand} uninstall`,
     "```",
     "",
     "## Direct GitHub Commands",
@@ -476,6 +524,58 @@ function ensurePackageScripts({ dryRun = false } = {}) {
   return result;
 }
 
+function removePackageScripts({ dryRun = false } = {}) {
+  const detected = detectProjectPackageJson();
+  const result = {
+    packageJsonExists: detected.exists,
+    removed: [],
+    skipped: [],
+    conflicts: [],
+  };
+
+  if (!detected.exists) {
+    return result;
+  }
+
+  if (!detected.packageJson || typeof detected.packageJson !== "object") {
+    result.conflicts.push({
+      script: null,
+      reason: "package.json could not be parsed",
+    });
+    return result;
+  }
+
+  const packageJson = detected.packageJson;
+  const scripts = packageJson.scripts && typeof packageJson.scripts === "object"
+    ? packageJson.scripts
+    : {};
+
+  for (const [name, value] of Object.entries(flowScripts)) {
+    if (!scripts[name]) {
+      continue;
+    }
+
+    if (scripts[name] === value) {
+      delete scripts[name];
+      result.removed.push(name);
+    } else {
+      result.skipped.push(name);
+    }
+  }
+
+  if (result.removed.length > 0 && !dryRun) {
+    if (Object.keys(scripts).length > 0) {
+      packageJson.scripts = scripts;
+    } else {
+      delete packageJson.scripts;
+    }
+
+    writeJson(detected.path, packageJson);
+  }
+
+  return result;
+}
+
 function ensureConvenienceFiles({ dryRun = false, force = false } = {}) {
   const scripts = ensurePackageScripts({ dryRun });
   const commandsFile = ensureCommandsFile({
@@ -518,6 +618,180 @@ function printConvenienceSummary(convenience, { dryRun = false } = {}) {
     log(dryRun ? "Commands cheat sheet: would update" : "Commands cheat sheet: updated");
   } else {
     log("Commands cheat sheet: unchanged");
+  }
+}
+
+function collectUninstallPlan({ force = false } = {}) {
+  const manifest = readJson(manifestPath(), null);
+  const files = [];
+  const skippedModified = [];
+  const skippedUnsafe = [];
+  const missing = [];
+  const protectedPaths = new Set(["epics", "epics/.gitkeep"]);
+
+  const manifestFiles = manifest && manifest.files && typeof manifest.files === "object"
+    ? Object.entries(manifest.files)
+    : getTemplateSpecs().map((spec) => [
+        spec.targetRel,
+        {
+          hash: hashFile(spec.source),
+          kind: spec.kind,
+        },
+      ]);
+
+  for (const [targetRel, entry] of manifestFiles) {
+    const normalizedTarget = normalizePortable(targetRel);
+
+    if (protectedPaths.has(normalizedTarget) || normalizedTarget.startsWith("epics/")) {
+      continue;
+    }
+
+    const target = path.resolve(cwd, normalizedTarget);
+
+    if (!isPathInside(target, cwd)) {
+      skippedUnsafe.push(normalizedTarget);
+      continue;
+    }
+
+    if (!fs.existsSync(target)) {
+      missing.push(normalizedTarget);
+      continue;
+    }
+
+    const expectedHash = entry && entry.hash;
+    const currentHash = hashFile(target);
+
+    if (force || !expectedHash || currentHash === expectedHash) {
+      files.push(normalizedTarget);
+    } else {
+      skippedModified.push(normalizedTarget);
+    }
+  }
+
+  for (const generated of [".coding-flow/COMMANDS.md", ".coding-flow/harness.json"]) {
+    const target = path.join(cwd, generated);
+
+    if (fs.existsSync(target) && !files.includes(generated)) {
+      files.push(generated);
+    }
+  }
+
+  return {
+    manifestExists: Boolean(manifest),
+    files: [...new Set(files)].sort((a, b) => b.localeCompare(a)),
+    skippedModified,
+    skippedUnsafe,
+    missing,
+    preserves: ["epics/"],
+  };
+}
+
+function uninstall({ dryRun = false, force = false, json = false } = {}) {
+  const plan = collectUninstallPlan({ force });
+  const removedFiles = [];
+  const removedDirs = [];
+  const blockingSkipped = plan.skippedModified.length > 0 && !force;
+  const blockingUnsafe = plan.skippedUnsafe.length > 0;
+  const blocked = blockingSkipped || blockingUnsafe;
+
+  if (!blocked) {
+    for (const targetRel of plan.files) {
+      const target = path.resolve(cwd, targetRel);
+
+      if (removeFileIfExists(target, { dryRun })) {
+        removedFiles.push(targetRel);
+        removedDirs.push(...removeEmptyDirsUpward(path.dirname(target), cwd, { dryRun }));
+      }
+    }
+
+    if (fs.existsSync(harnessRunsDir())) {
+      const runFiles = walkFiles(harnessRunsDir()).map((filePath) => normalizePortable(path.relative(cwd, filePath)));
+
+      for (const runFile of runFiles) {
+        const target = path.join(cwd, runFile);
+
+        if (removeFileIfExists(target, { dryRun })) {
+          removedFiles.push(runFile);
+        }
+      }
+
+      removedDirs.push(...removeEmptyDirsUpward(harnessRunsDir(), cwd, { dryRun }));
+    }
+
+    const manifestRemoved = removeFileIfExists(manifestPath(), { dryRun });
+
+    if (manifestRemoved) {
+      removedFiles.push(".coding-flow/manifest.json");
+    }
+
+    removedDirs.push(...removeEmptyDirsUpward(path.join(cwd, ".coding-flow"), cwd, { dryRun }));
+  }
+
+  const scripts = blocked
+    ? {
+        packageJsonExists: detectProjectPackageJson().exists,
+        removed: [],
+        skipped: [],
+        conflicts: [],
+      }
+    : removePackageScripts({ dryRun });
+  const result = {
+    ok: !blocked && scripts.conflicts.length === 0,
+    dryRun,
+    force,
+    removedFiles: [...new Set(removedFiles)].sort(),
+    removedDirs: [...new Set(removedDirs)].sort(),
+    skippedModified: plan.skippedModified,
+    skippedUnsafe: plan.skippedUnsafe,
+    removedScripts: scripts.removed,
+    skippedScripts: scripts.skipped,
+    scriptConflicts: scripts.conflicts,
+    preserved: plan.preserves,
+  };
+
+  if (json) {
+    log(JSON.stringify(result, null, 2));
+  } else {
+    if (blockingUnsafe) {
+      log("Coding Flow uninstall blocked by unsafe manifest paths.");
+    } else if (blockingSkipped) {
+      log("Coding Flow uninstall blocked by modified installed files.");
+    } else {
+      log(dryRun ? "Coding Flow uninstall dry run." : "Coding Flow uninstalled.");
+    }
+
+    log(`Removed files: ${result.removedFiles.length}`);
+    log(`Removed package scripts: ${result.removedScripts.length}`);
+    log("Preserved: epics/");
+
+    if (result.skippedModified.length > 0) {
+      log("");
+      log("Skipped modified files:");
+      for (const file of result.skippedModified) {
+        log(`- ${file}`);
+      }
+      log("Use --force only if you intentionally want to remove modified Coding Flow files.");
+    }
+
+    if (result.skippedUnsafe.length > 0) {
+      log("");
+      log("Skipped unsafe manifest paths:");
+      for (const file of result.skippedUnsafe) {
+        log(`- ${file}`);
+      }
+    }
+
+    if (result.skippedScripts.length > 0) {
+      log("");
+      log("Skipped package scripts with custom commands:");
+      for (const script of result.skippedScripts) {
+        log(`- ${script}`);
+      }
+    }
+  }
+
+  if (!result.ok) {
+    process.exitCode = 1;
   }
 }
 
@@ -1904,6 +2178,7 @@ function printCommands({ json = false } = {}) {
       init: `${githubNpxCommand} init`,
       upgrade: `${githubNpxCommand} upgrade`,
       fix: `${githubNpxCommand} doctor --fix`,
+      uninstall: `${githubNpxCommand} uninstall`,
     },
     cheatsheet: normalizePortable(path.relative(cwd, commandsPath())),
   };
@@ -1946,6 +2221,7 @@ Usage:
   ai-flow bootstrap --scan [--dry-run] [--json]
   ai-flow harness init|preflight|check|evidence [--story path] [--json]
   ai-flow commands [--json]
+  ai-flow uninstall [--dry-run] [--force] [--json]
   ai-flow list-skills [--json]
   ai-flow help
 
@@ -1957,6 +2233,7 @@ Commands:
   bootstrap    Scan a brownfield project and write docs/bootstrap-scan.md.
   harness      Run security evidence checks and write lightweight run evidence.
   commands     Show the easiest commands for this project.
+  uninstall    Remove Coding Flow files and scripts while preserving epics/stories.
   list-skills  List available workflow skills.
   help         Show this help message.
 
@@ -2030,6 +2307,12 @@ if (command === "init") {
   harnessCommand();
 } else if (command === "commands") {
   printCommands({
+    json: flags.has("--json"),
+  });
+} else if (command === "uninstall") {
+  uninstall({
+    dryRun: flags.has("--dry-run"),
+    force: flags.has("--force"),
     json: flags.has("--json"),
   });
 } else if (command === "list-skills") {
