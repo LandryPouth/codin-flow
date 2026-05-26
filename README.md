@@ -4,18 +4,64 @@ Coding Flow est un workflow d'ingénierie AI-native pour les développeurs qui u
 
 Son but est simple : rendre le développement assisté par IA plus prévisible, moins coûteux en tokens, et capable de livrer des features complètes en une seule passe quand le contexte est clair.
 
-Il installe dans votre projet :
+En pratique, Coding Flow installe un petit système de travail dans votre projet. Ce système donne aux agents :
 
 - des skills réutilisables pour planifier, implémenter, tester et reviewer ;
 - des règles projet partagées entre agents ;
 - une structure légère d'epics et de stories verticales ;
 - des modes d'exécution adaptés au risque : `QUICK`, `FAST`, `STANDARD`, `STRICT` ;
 - une stratégie de contexte pour éviter qu'une story simple consomme une demi context window ;
-- des garde-fous de validation, rollback et documentation.
+- des garde-fous de validation, rollback, documentation et preuves de sécurité.
+
+Coding Flow n'est pas un framework applicatif et ne remplace pas votre stack. Il ajoute une couche de méthode autour de votre repo pour que l'agent sache quoi lire, quoi produire, quand s'arrêter, quoi valider et comment laisser une trace utile.
+
+## Vue D'Ensemble
+
+Le projet repose sur quatre blocs simples :
+
+1. **Le CLI `ai-flow`**
+   Il installe, met à jour et vérifie les fichiers du workflow. Il peut aussi scanner un projet existant, lister les stories et exécuter le harness de sécurité.
+
+2. **Les fichiers de contexte**
+   `PROJECT_RULES.md`, `AGENT_RULES.md`, `docs/project-context.md`, `docs/architecture.md`, `docs/conventions.md` et `docs/roadmap.md` donnent à l'agent les règles et la carte durable du projet.
+
+3. **Les skills**
+   Les skills sont des workflows réutilisables. Par exemple `$plan-epic` découpe une capacité produit en stories, `$run-story` exécute une story, et `$run-story-secure` ajoute des validations sécurité.
+
+4. **Le harness de sécurité**
+   Le harness rend certains garde-fous vérifiables par le CLI : secrets, fichiers sensibles, niveau de risque d'une story, notes de rollback et preuves JSON dans `.coding-flow/runs/`.
+
+## Comment Ça Marche
+
+Le workflow normal ressemble à ceci :
+
+```txt
+1. ai-flow init
+   -> installe les règles, docs, skills, exemples et la policy harness.
+
+2. L'agent lit PROJECT_RULES.md et AGENT_RULES.md
+   -> il comprend les limites, les modes et les stop conditions.
+
+3. Vous planifiez un epic ou une story
+   -> $plan-epic, $write-story ou $bootstrap-brownfield.
+
+4. Vous exécutez une story
+   -> $quick-story, $run-story ou $run-story-secure.
+
+5. L'agent implémente, teste, valide et documente
+   -> implementation-notes.md, decisions.md si nécessaire, harness evidence si applicable.
+
+6. ai-flow doctor / harness check peuvent vérifier l'installation et les preuves
+   -> utile localement, en CI ou avant release.
+```
+
+Le point important : l'utilisateur ne doit pas enchaîner dix commandes à la main. Les commandes `harness` existent pour le debug et la CI, mais les workflows `$run-story` et `$run-story-secure` demandent à l'agent de les appeler automatiquement quand `ai-flow` est disponible.
 
 ## Table Des Matières
 
 - [Installation rapide](#installation-rapide)
+- [Vue d'ensemble](#vue-densemble)
+- [Comment ça marche](#comment-ça-marche)
 - [Démarrage en 10 minutes](#démarrage-en-10-minutes)
 - [Quel workflow choisir ?](#quel-workflow-choisir-)
 - [Concepts essentiels](#concepts-essentiels)
@@ -34,44 +80,44 @@ Il installe dans votre projet :
 Dans le projet que vous voulez équiper :
 
 ```bash
-npx ai-native-coding-flow init
+npx coding-flow init
 ```
 
 Vérifiez ensuite l'installation :
 
 ```bash
-npx ai-native-coding-flow doctor
+npx coding-flow doctor
 ```
 
 Si `doctor` signale des fichiers manquants ou un miroir `.agents` désynchronisé :
 
 ```bash
-npx ai-native-coding-flow doctor --fix
+npx coding-flow doctor --fix
 ```
 
 Pour inspecter les skills disponibles :
 
 ```bash
-npx ai-native-coding-flow list-skills
+npx coding-flow list-skills
 ```
 
 Pour mettre à jour un projet déjà initialisé sans écraser les modifications locales :
 
 ```bash
-npx ai-native-coding-flow upgrade --dry-run
-npx ai-native-coding-flow upgrade
+npx coding-flow upgrade --dry-run
+npx coding-flow upgrade
 ```
 
 Pour voir l'état des epics et stories :
 
 ```bash
-npx ai-native-coding-flow status
+npx coding-flow status
 ```
 
 Pour préparer un projet existant :
 
 ```bash
-npx ai-native-coding-flow bootstrap --scan
+npx coding-flow bootstrap --scan
 ```
 
 Si le package est installé globalement ou lié localement :
@@ -376,6 +422,8 @@ Important :
 
 .coding-flow/
   manifest.json
+  harness.json
+  runs/
 
 docs/
   project-context.md
@@ -401,6 +449,10 @@ Coding Flow installe aussi les mêmes skills dans `.agents/skills/` pour Codex e
 Le miroir est volontairement physique plutôt qu'un symlink pour rester compatible avec Windows, npm, archives zip, CI et agents qui ne suivent pas toujours les liens symboliques. `ai-flow doctor` vérifie que le miroir reste conforme, et `ai-flow doctor --fix` peut le resynchroniser.
 
 `.coding-flow/manifest.json` permet à `ai-flow upgrade` de mettre à jour les fichiers installés sans écraser les modifications locales.
+
+`.coding-flow/harness.json` contient la policy de sécurité légère installée par défaut : chemins bloqués, patterns de fichiers sensibles, checks attendus et mots-clés qui font monter une story en risque moyen ou élevé.
+
+`.coding-flow/runs/` reçoit les preuves JSON produites par `ai-flow harness evidence`. Ces fichiers servent surtout aux reviews, à la CI et aux audits légers.
 
 `CLAUDE.md` importe les règles projet :
 
@@ -578,6 +630,7 @@ Stocke ce qui s'est réellement passé :
 - fichiers modifiés ;
 - tests lancés ;
 - validations ;
+- notes de rollback ;
 - problèmes rencontrés ;
 - follow-ups ;
 - risques restants.
@@ -635,21 +688,69 @@ Quand une stop condition se déclenche, l'agent doit expliquer :
 
 | Commande | Usage |
 | --- | --- |
-| `ai-flow init` | Installer les templates dans un projet. |
+| `ai-flow init` | Installer les templates, le manifest et la policy harness dans un projet. |
 | `ai-flow upgrade` | Mettre à jour les fichiers installés sans écraser les modifications locales. |
 | `ai-flow doctor` | Vérifier les fichiers, skills, frontmatter, manifest et miroir `.agents`. |
 | `ai-flow doctor --fix` | Restaurer les fichiers manquants et resynchroniser `.agents/skills`. |
 | `ai-flow doctor --strict` | Ajouter des checks plus stricts sur manifest et docs. |
 | `ai-flow status` | Lister les epics/stories et leur statut inféré. |
 | `ai-flow bootstrap --scan` | Scanner un codebase existant et écrire `docs/bootstrap-scan.md`. |
+| `ai-flow harness init` | Créer une policy `.coding-flow/harness.json` explicite. |
+| `ai-flow harness preflight --story <path>` | Estimer le risque d'une story et lister les checks requis. |
+| `ai-flow harness check --story <path>` | Vérifier secrets, fichiers sensibles et preuves minimales de story. |
+| `ai-flow harness evidence --story <path>` | Écrire une preuve légère dans `.coding-flow/runs/`. |
 | `ai-flow list-skills` | Afficher les skills disponibles. |
 
 Commandes utiles en CI :
 
 ```bash
 ai-flow doctor --json
+ai-flow harness check --json
 ai-flow status --json
 ai-flow list-skills --json
+```
+
+## Harness De Sécurité
+
+Le harness est une couche de preuves légère. Il ne remplace pas les skills de validation, mais il rend certains garde-fous vérifiables par le CLI.
+
+Il répond à trois questions :
+
+- **Est-ce que la story est risquée ?** `preflight` lit les fichiers de story et recommande `FAST`, `STANDARD` ou `STRICT`.
+- **Est-ce que le repo contient des signaux dangereux ?** `check` cherche des secrets évidents, fichiers sensibles et preuves manquantes.
+- **Qu'est-ce qui prouve que la story a été traitée correctement ?** `evidence` écrit un résumé JSON avec risque, fichiers changés, checks requis, résultat du harness et rollback notes.
+
+Ce que le harness vérifie aujourd'hui :
+
+- détection de secrets évidents ;
+- détection de fichiers sensibles comme `.env`, clés privées ou credentials ;
+- préflight de story pour choisir le bon niveau de rigueur ;
+- vérification des notes de rollback et des preuves de validation sur les stories risquées ;
+- journal JSON dans `.coding-flow/runs/` pour garder une trace exploitable en CI ou en review.
+
+Ce que le harness ne fait pas :
+
+- il ne sandboxe pas l'agent ;
+- il n'intercepte pas toutes les commandes shell ;
+- il ne remplace pas les tests, lint, typecheck ou reviews ;
+- il ne garantit pas qu'une application est sécurisée.
+
+Son rôle est plus modeste et plus utile : détecter les erreurs évidentes, rendre les workflows sensibles plus explicites, et laisser une preuve exploitable sans alourdir le quotidien.
+
+Le workflow quotidien reste simple. `ai-flow init` crée la policy harness par défaut si elle n'existe pas, puis les skills `$run-story` et `$run-story-secure` appellent le harness automatiquement quand `ai-flow` est disponible. Les commandes `ai-flow harness ...` servent surtout au debug, à la CI ou aux vérifications ponctuelles.
+
+Réinitialisation optionnelle dans un projet cible déjà installé :
+
+```bash
+ai-flow harness init
+```
+
+Exemples manuels :
+
+```bash
+ai-flow harness preflight --story epics/epic-01/story-01-01
+ai-flow harness check --story epics/epic-01/story-01-01
+ai-flow harness evidence --story epics/epic-01/story-01-01
 ```
 
 ## Développement Local Du Package
@@ -671,6 +772,7 @@ cd /tmp/coding-flow-test
 node /path/to/coding-flow/bin/ai-flow.js init --force
 node /path/to/coding-flow/bin/ai-flow.js doctor
 node /path/to/coding-flow/bin/ai-flow.js doctor --json
+node /path/to/coding-flow/bin/ai-flow.js harness check --quick
 node /path/to/coding-flow/bin/ai-flow.js status
 node /path/to/coding-flow/bin/ai-flow.js bootstrap --scan
 ```
@@ -683,6 +785,7 @@ ai-flow init --dry-run
 ai-flow doctor
 ai-flow doctor --fix
 ai-flow upgrade --dry-run
+ai-flow harness check --quick
 ai-flow status
 ai-flow bootstrap --scan
 ai-flow list-skills
@@ -694,7 +797,7 @@ Choisissez un nom unique dans `package.json`. Pour un package scoped :
 
 ```json
 {
-  "name": "@your-scope/ai-native-coding-flow"
+  "name": "@your-scope/coding-flow"
 }
 ```
 

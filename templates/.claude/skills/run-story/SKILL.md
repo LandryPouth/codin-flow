@@ -20,6 +20,17 @@ Use `run-story-secure` instead when the story touches auth, permissions, admin s
 - Atomic skills remain authoritative for their own phase.
 - If a phase finds blocking issues, fix them before continuing.
 
+## Harness Automation
+
+When `ai-flow` is available in the project, use the Security Evidence Harness automatically. The user should not need to ask for these commands.
+
+- Before choosing or finalizing the mode, run `ai-flow harness preflight --story <story-dir>` when a story directory exists.
+- Use the preflight risk and required checks to confirm FAST, STANDARD, STRICT, or escalation to `$run-story-secure`.
+- After implementation, validation, and notes, run `ai-flow harness check --story <story-dir>` for story work.
+- At the end of STANDARD or STRICT story work, run `ai-flow harness evidence --story <story-dir>` to write `.coding-flow/runs/*-evidence.json`.
+- If no story directory exists, use `ai-flow harness check --quick` after the change for a lightweight secret/sensitive-file pass.
+- If the harness command is unavailable, continue the workflow and record that harness validation could not run.
+
 ## Context Policy
 
 Use the lightest context path that still lets the story ship in one focused implementation pass.

@@ -120,6 +120,7 @@ Pipeline:
 
 ## Quality Gates
 
+- When `ai-flow harness` is available, use it automatically for story work: `preflight` before orchestration, `check` after validation, and `evidence` at the end of STANDARD, STRICT, or secure stories.
 - Run relevant tests.
 - Run lint and typecheck when available.
 - If validation fails, fix the root cause when feasible.

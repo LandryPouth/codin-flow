@@ -1,6 +1,6 @@
 ---
 name: blueprint-implementation-notes
-description: Create or update a story implementation-notes.md file. Use after implementation to summarize files changed, tests run, validation results, issues, follow-ups, and remaining risks.
+description: Create or update a story implementation-notes.md file. Use after implementation to summarize files changed, tests run, validation results, rollback notes, issues, follow-ups, and remaining risks.
 ---
 
 # Blueprint Implementation Notes
@@ -27,8 +27,9 @@ Do not move implementation logs into `docs/project-context.md`; only summarize d
 3. List changed files.
 4. Record validation commands and results.
 5. Record validator outcomes.
-6. Document issues encountered.
-7. Capture follow-ups and remaining risks.
+6. Capture rollback notes.
+7. Document issues encountered.
+8. Capture follow-ups and remaining risks.
 
 ## Template
 
@@ -68,6 +69,10 @@ Notes:
 
 Pass/fail:
 Notes:
+
+## Rollback Notes
+
+-
 
 ## Issues Encountered
 

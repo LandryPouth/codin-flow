@@ -18,6 +18,16 @@ This workflow includes the normal story pipeline plus security validation. Use i
 - Server-side enforcement beats client-side checks.
 - Atomic skills remain authoritative for their own phase.
 
+## Harness Automation
+
+When `ai-flow` is available in the project, use the Security Evidence Harness automatically. This is part of the secure workflow, not an optional manual step.
+
+- Before orchestration, run `ai-flow harness preflight --story <story-dir>` and use the output to confirm risk, stop conditions, and required checks.
+- After implementation, validators, and `implementation-notes.md`, run `ai-flow harness check --story <story-dir>`.
+- If the harness check fails, fix the issue or report a blocking security risk before finalizing.
+- At the end, run `ai-flow harness evidence --story <story-dir>` to write `.coding-flow/runs/*-evidence.json`.
+- If the harness command is unavailable, record that harness validation could not run and keep the normal secure validators.
+
 ## Pipeline
 
 1. Use `$agent-planner` or `$grill-me` if requirements, permissions, or data visibility are unclear.
