@@ -86,35 +86,52 @@ Dans le projet que vous voulez équiper :
 npx github:LandryPouth/codin-flow init
 ```
 
-Vérifiez ensuite l'installation dans ce projet cible :
+Si le projet contient un `package.json`, `init` ajoute aussi des scripts locaux `flow:*`. Le quotidien devient alors :
+
+```bash
+npm run flow:doctor
+npm run flow:skills
+npm run flow:status
+npm run flow:check
+```
+
+`init` crée aussi un pense-bête local :
+
+```txt
+.coding-flow/COMMANDS.md
+```
+
+Si le projet n'a pas de `package.json`, utilisez les commandes GitHub directes :
 
 ```bash
 npx github:LandryPouth/codin-flow doctor
+npx github:LandryPouth/codin-flow list-skills
+npx github:LandryPouth/codin-flow status
+```
+
+Pour afficher les commandes utiles depuis le projet :
+
+```bash
+npm run flow:commands
+```
+
+Ou, sans scripts locaux :
+
+```bash
+npx github:LandryPouth/codin-flow commands
 ```
 
 Si `doctor` signale des fichiers manquants ou un miroir `.agents` désynchronisé :
 
 ```bash
-npx github:LandryPouth/codin-flow doctor --fix
+npm run flow:fix
 ```
 
-Pour inspecter les skills disponibles :
+Pour mettre à jour les fichiers Coding Flow installés dans un projet sans écraser les modifications locales :
 
 ```bash
-npx github:LandryPouth/codin-flow list-skills
-```
-
-Pour mettre à jour un projet déjà initialisé sans écraser les modifications locales :
-
-```bash
-npx github:LandryPouth/codin-flow upgrade --dry-run
-npx github:LandryPouth/codin-flow upgrade
-```
-
-Pour voir l'état des epics et stories :
-
-```bash
-npx github:LandryPouth/codin-flow status
+npm run flow:upgrade -- --dry-run
+npm run flow:upgrade
 ```
 
 Pour préparer un projet existant :
@@ -123,20 +140,14 @@ Pour préparer un projet existant :
 npx github:LandryPouth/codin-flow bootstrap --scan
 ```
 
-Si vous préférez une commande courte pendant une session de travail, vous pouvez aussi lancer le CLI avec `npm exec` :
-
-```bash
-npm exec github:LandryPouth/codin-flow -- doctor
-npm exec github:LandryPouth/codin-flow -- list-skills
-```
-
 Pour le développement local du package, clonez le repo puis utilisez `npm link` ; voir [Développement local du package](#développement-local-du-package).
 
-Si le package est lié localement avec `npm link`, les commandes courtes deviennent disponibles :
+Si le package est lié localement avec `npm link`, les commandes courtes `ai-flow` deviennent disponibles :
 
 ```bash
 ai-flow init
 ai-flow doctor
+ai-flow commands
 ai-flow upgrade
 ai-flow status
 ai-flow list-skills
@@ -157,9 +168,9 @@ npx github:LandryPouth/codin-flow init --dry-run
 Pour une sortie lisible par CI ou scripts :
 
 ```bash
-npx github:LandryPouth/codin-flow doctor --json
-npx github:LandryPouth/codin-flow status --json
-npx github:LandryPouth/codin-flow list-skills --json
+npm run flow:doctor -- --json
+npm run flow:status -- --json
+npm run flow:skills -- --json
 ```
 
 ## Démarrage En 10 Minutes
@@ -435,6 +446,7 @@ Important :
 .coding-flow/
   manifest.json
   harness.json
+  COMMANDS.md
   runs/
 
 docs/
@@ -463,6 +475,8 @@ Le miroir est volontairement physique plutôt qu'un symlink pour rester compatib
 `.coding-flow/manifest.json` permet à `ai-flow upgrade` de mettre à jour les fichiers installés sans écraser les modifications locales.
 
 `.coding-flow/harness.json` contient la policy de sécurité légère installée par défaut : chemins bloqués, patterns de fichiers sensibles, checks attendus et mots-clés qui font monter une story en risque moyen ou élevé.
+
+`.coding-flow/COMMANDS.md` est le pense-bête local des commandes quotidiennes. Il évite de retourner sur GitHub pour retrouver la bonne syntaxe.
 
 `.coding-flow/runs/` reçoit les preuves JSON produites par `ai-flow harness evidence`. Ces fichiers servent surtout aux reviews, à la CI et aux audits légers.
 
@@ -711,15 +725,27 @@ Quand une stop condition se déclenche, l'agent doit expliquer :
 | `ai-flow harness preflight --story <path>` | Estimer le risque d'une story et lister les checks requis. |
 | `ai-flow harness check --story <path>` | Vérifier secrets, fichiers sensibles et preuves minimales de story. |
 | `ai-flow harness evidence --story <path>` | Écrire une preuve légère dans `.coding-flow/runs/`. |
+| `ai-flow commands` | Afficher les commandes les plus utiles pour le projet courant. |
 | `ai-flow list-skills` | Afficher les skills disponibles. |
+
+Après `init`, les projets avec `package.json` ont aussi des scripts plus faciles à retenir :
+
+| Script local | Usage |
+| --- | --- |
+| `npm run flow:doctor` | Vérifier l'installation. |
+| `npm run flow:check` | Lancer `doctor --strict` avec les checks harness rapides. |
+| `npm run flow:skills` | Afficher les skills disponibles. |
+| `npm run flow:status` | Lister les epics/stories. |
+| `npm run flow:harness` | Lancer le check harness rapide. |
+| `npm run flow:commands` | Afficher le pense-bête des commandes. |
 
 Commandes utiles en CI :
 
 ```bash
-ai-flow doctor --json
-ai-flow harness check --json
-ai-flow status --json
-ai-flow list-skills --json
+npm run flow:doctor -- --json
+npm run flow:harness -- --json
+npm run flow:status -- --json
+npm run flow:skills -- --json
 ```
 
 ## Harness De Sécurité
@@ -784,6 +810,7 @@ cd /tmp/coding-flow-test
 node /path/to/codin-flow/bin/ai-flow.js init --force
 node /path/to/codin-flow/bin/ai-flow.js doctor
 node /path/to/codin-flow/bin/ai-flow.js doctor --json
+node /path/to/codin-flow/bin/ai-flow.js commands
 node /path/to/codin-flow/bin/ai-flow.js harness check --quick
 node /path/to/codin-flow/bin/ai-flow.js status
 node /path/to/codin-flow/bin/ai-flow.js bootstrap --scan
@@ -796,6 +823,7 @@ npm link
 ai-flow init --dry-run
 ai-flow doctor
 ai-flow doctor --fix
+ai-flow commands
 ai-flow upgrade --dry-run
 ai-flow harness check --quick
 ai-flow status
@@ -813,6 +841,8 @@ npx github:LandryPouth/codin-flow doctor
 ```
 
 Chaque appel `npx github:LandryPouth/codin-flow ...` récupère le package depuis GitHub et exécute le binaire déclaré dans `package.json`.
+
+Après `init`, un projet avec `package.json` peut utiliser les scripts locaux `npm run flow:*`, donc l'utilisateur n'a plus besoin de mémoriser la commande GitHub complète pour les actions courantes.
 
 Pour travailler sur le package lui-même, clonez le repo et liez la commande localement :
 
