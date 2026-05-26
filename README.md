@@ -74,60 +74,72 @@ Le point important : l'utilisateur ne doit pas enchaîner dix commandes à la ma
 - [Stop conditions](#stop-conditions)
 - [Commandes CLI](#commandes-cli)
 - [Développement local du package](#développement-local-du-package)
+- [Distribution GitHub](#distribution-github)
 
 ## Installation Rapide
 
-Dans le projet que vous voulez équiper :
+Coding Flow est distribué depuis GitHub. Il n'est pas nécessaire de le publier sur npm.
+
+Installation globale depuis le repo GitHub :
 
 ```bash
-npx coding-flow init
+gh repo clone LandryPouth/codin-flow
+cd codin-flow
+npm install
+npm link
 ```
 
-Vérifiez ensuite l'installation :
+Puis, dans le projet que vous voulez équiper :
 
 ```bash
-npx coding-flow doctor
+cd /chemin/vers/votre-projet
+ai-flow init
+```
+
+Vérifiez ensuite l'installation dans ce projet cible :
+
+```bash
+ai-flow doctor
 ```
 
 Si `doctor` signale des fichiers manquants ou un miroir `.agents` désynchronisé :
 
 ```bash
-npx coding-flow doctor --fix
+ai-flow doctor --fix
 ```
 
 Pour inspecter les skills disponibles :
 
 ```bash
-npx coding-flow list-skills
+ai-flow list-skills
 ```
 
 Pour mettre à jour un projet déjà initialisé sans écraser les modifications locales :
 
 ```bash
-npx coding-flow upgrade --dry-run
-npx coding-flow upgrade
+ai-flow upgrade --dry-run
+ai-flow upgrade
 ```
 
 Pour voir l'état des epics et stories :
 
 ```bash
-npx coding-flow status
+ai-flow status
 ```
 
 Pour préparer un projet existant :
 
 ```bash
-npx coding-flow bootstrap --scan
+ai-flow bootstrap --scan
 ```
 
-Si le package est installé globalement ou lié localement :
+Pour mettre à jour l'outil lui-même depuis GitHub :
 
 ```bash
-ai-flow init
-ai-flow doctor
-ai-flow upgrade
-ai-flow status
-ai-flow list-skills
+cd /chemin/vers/codin-flow
+git pull
+npm install
+npm link
 ```
 
 Par défaut, les fichiers existants ne sont pas écrasés. Pour réinstaller volontairement les templates :
@@ -769,12 +781,12 @@ Tester l'installation dans un dossier temporaire :
 ```bash
 mkdir /tmp/coding-flow-test
 cd /tmp/coding-flow-test
-node /path/to/coding-flow/bin/ai-flow.js init --force
-node /path/to/coding-flow/bin/ai-flow.js doctor
-node /path/to/coding-flow/bin/ai-flow.js doctor --json
-node /path/to/coding-flow/bin/ai-flow.js harness check --quick
-node /path/to/coding-flow/bin/ai-flow.js status
-node /path/to/coding-flow/bin/ai-flow.js bootstrap --scan
+node /path/to/codin-flow/bin/ai-flow.js init --force
+node /path/to/codin-flow/bin/ai-flow.js doctor
+node /path/to/codin-flow/bin/ai-flow.js doctor --json
+node /path/to/codin-flow/bin/ai-flow.js harness check --quick
+node /path/to/codin-flow/bin/ai-flow.js status
+node /path/to/codin-flow/bin/ai-flow.js bootstrap --scan
 ```
 
 Tester comme commande globale :
@@ -791,25 +803,27 @@ ai-flow bootstrap --scan
 ai-flow list-skills
 ```
 
-## Publication npm
+## Distribution GitHub
 
-Choisissez un nom unique dans `package.json`. Pour un package scoped :
-
-```json
-{
-  "name": "@your-scope/coding-flow"
-}
-```
-
-Puis :
+La distribution officielle passe par GitHub :
 
 ```bash
-npm login
-npm pack --dry-run
-npm publish --access public
+gh repo clone LandryPouth/codin-flow
+cd codin-flow
+npm install
+npm link
 ```
 
-Utilisez `--access public` lors de la première publication d'un package scoped public.
+Pour mettre à jour l'installation locale :
+
+```bash
+cd /chemin/vers/codin-flow
+git pull
+npm install
+npm link
+```
+
+`npm pack --dry-run` reste utile pour vérifier ce qui serait embarqué dans une archive, mais le projet n'a pas besoin d'être publié sur npm pour être utilisé.
 
 ## Roadmap
 
